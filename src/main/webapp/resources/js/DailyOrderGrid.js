@@ -1,0 +1,120 @@
+var selectedUserId = null;
+
+var reader = new Ext.data.ArrayReader({},[
+    {name: 'id',type: 'int'},
+    {name:'cmOrder',type:'float'},
+    {name:'bmOrder',type:'float'},
+    {name:'orderDate',type:'date',format:'Y-m-d'}
+]);
+
+dailyOrderStore = new Ext.data.JsonStore({
+    autoLoad: false,
+    restful: true,
+    storeId: 'dailyOrdersStoreId',
+    url: './rest/dailyOrders/search?userId=', //Though nothing is mentioned here, the actual value will be given when processSelectedCustomer method is being executed.
+    root: 'dailyOrders',
+    fields: [
+        {name: 'id'},
+        {name: 'cmOrder'},
+        {name: 'bmOrder'},
+        {name: 'orderDate'}
+    ],
+    listeners:{
+        load:function(dailyOrderStore, records, options){
+
+        },
+        update:function(store, record, operation){
+            var changedOrderDate = record.data.orderDate.format('Y-m-d');
+            record.data.orderDate = changedOrderDate;
+            var values = record.data;
+            var jsonValues = Ext.encode(values);
+            Ext.Ajax.request({
+                url: '/rest/dailyOrders/',
+                method:'PUT',
+                headers:{'Content-Type':'application/json; charset=utf-8'},
+                success: function(response, opts){
+                    PageBus.publish("DailyOrderGrid.DailyOrder.modified",record.data);
+                },
+                failure: function(response, opts){
+                    console.log('server-side failure with status code ' + response.status);
+                },
+                params: jsonValues
+            });
+        }
+    }
+});
+
+dailyOrderGroupStore = new Ext.data.GroupingStore({
+    reader: reader,
+    data: dailyOrderStore.data,
+    sortInfo:{field: 'orderDate', direction: "ASC"}
+});
+
+var editor = new Ext.ux.grid.RowEditor({
+    saveText: 'Update'
+});
+var groupingView = new Ext.grid.GroupingView({
+    forceFit:true,
+    groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "Items" : "Item"]})'
+});
+
+DailyOrdersGrid = Ext.extend(Ext.grid.GridPanel, {
+    height: 471,
+    width: 785,
+    selectedUserId:null,
+    title: 'Daily Orders',
+    store: dailyOrderGroupStore,
+    plugins: [editor],
+    view:groupingView ,
+    initComponent: function () {
+        Ext.applyIf(this, {
+            columns: [
+                new Ext.grid.RowNumberer(),
+                {
+                    xtype: 'gridcolumn', dataIndex: 'cmOrder', header: 'CM Order', sortable: true, width: 100,
+                    editor: {
+                        xtype: 'numberfield',
+                        allowBlank: false,
+                        minValue: 0,
+                        maxValue: 150000
+                    }
+                },
+                {
+                    xtype: 'gridcolumn', dataIndex: 'bmOrder', header: 'BM Order', sortable: true, width: 100,
+                    editor: {
+                        xtype: 'numberfield',
+                        allowBlank: false,
+                        minValue: 0,
+                        maxValue: 150000
+                    }
+                },
+                {
+                    xtype: 'datecolumn', dataIndex: 'orderDate', header: 'OrderDate', sortable: true, width: 100, format: 'Y-m-d',
+                    editor:{
+                        xtype: 'datefield',
+                        allowBlank: false,
+                        minValue: '2012-12-01',
+                        minText: 'Can\'t have a start date before the company existed!'
+                    }
+                },
+                {
+                    xtype: 'datecolumn', dataIndex: 'orderDate', header: 'Month', sortable: true, width: 100, format: 'F'
+                }
+            ]
+        });
+        function processSelectedCustomer(topic, messageFromPublisher, subscriberData) {
+            dailyOrderStore.proxy.conn.url = './rest/dailyOrders/search?userId=' + messageFromPublisher.id;
+            selectedUserId = messageFromPublisher.id;
+            dailyOrderStore.load();
+        }
+
+        function processDailyOrdeChanged(topic, messageFromPublisher, subscriberData){
+            dailyOrderStore.proxy.conn.url = './rest/dailyOrders/search?userId=' + selectedUserId;
+            dailyOrderStore.load();
+        }
+
+        PageBus.subscribe("CustomerListGrid.customer.selected", this, processSelectedCustomer, 'DailyOrderGrid');
+        PageBus.subscribe("DailyOrderGrid.DailyOrder.modified", this, processDailyOrdeChanged, 'DailyOrderGrid');
+        DailyOrdersGrid.superclass.initComponent.call(this);
+    }
+});
