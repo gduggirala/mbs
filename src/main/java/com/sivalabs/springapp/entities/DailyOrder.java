@@ -3,6 +3,7 @@ package com.sivalabs.springapp.entities;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import javax.persistence.*;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -29,6 +30,9 @@ public class DailyOrder {
     @JoinColumn(name="USER_ID")
     @JsonBackReference
     private User user;
+
+    @Transient
+    private String month;
 
     public Long getId() {
         return id;
@@ -68,5 +72,11 @@ public class DailyOrder {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public String getMonth() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMMMM");
+        this.month = simpleDateFormat.format(this.getOrderDate());
+        return month;
     }
 }

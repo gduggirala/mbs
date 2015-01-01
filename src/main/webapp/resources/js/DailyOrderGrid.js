@@ -1,10 +1,11 @@
 var selectedUserId = null;
 
-var reader = new Ext.data.ArrayReader({},[
-    {name: 'id',type: 'int'},
-    {name:'cmOrder',type:'float'},
-    {name:'bmOrder',type:'float'},
-    {name:'orderDate',type:'date',format:'Y-m-d'}
+var reader = new Ext.data.ArrayReader({}, [
+    {name: 'id', type: 'int'},
+    {name: 'cmOrder', type: 'float'},
+    {name: 'bmOrder', type: 'float'},
+    {name: 'orderDate', type: 'date', format: 'Y-m-d'},
+    {name: 'month', type: 'string'}
 ]);
 
 dailyOrderStore = new Ext.data.JsonStore({
@@ -17,25 +18,29 @@ dailyOrderStore = new Ext.data.JsonStore({
         {name: 'id'},
         {name: 'cmOrder'},
         {name: 'bmOrder'},
-        {name: 'orderDate'}
+        {name: 'orderDate'},
+        {name: 'month'}
     ],
-    listeners:{
-        load:function(dailyOrderStore, records, options){
-
+    listeners: {
+        load:function(store, records,options){
+            var gridPanel = Ext.getCmp('dailyOrderGridId');
+            gridPanel.store.data = store.data;
+            gridPanel.getView().refresh(true);
+            gridPanel.getView().sort
         },
-        update:function(store, record, operation){
+        update: function (store, record, operation) {
             var changedOrderDate = record.data.orderDate.format('Y-m-d');
             record.data.orderDate = changedOrderDate;
             var values = record.data;
             var jsonValues = Ext.encode(values);
             Ext.Ajax.request({
                 url: '/rest/dailyOrders/',
-                method:'PUT',
-                headers:{'Content-Type':'application/json; charset=utf-8'},
-                success: function(response, opts){
-                    PageBus.publish("DailyOrderGrid.DailyOrder.modified",record.data);
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json; charset=utf-8'},
+                success: function (response, opts) {
+                    PageBus.publish("DailyOrderGrid.DailyOrder.modified", record.data);
                 },
-                failure: function(response, opts){
+                failure: function (response, opts) {
                     console.log('server-side failure with status code ' + response.status);
                 },
                 params: jsonValues
@@ -47,25 +52,27 @@ dailyOrderStore = new Ext.data.JsonStore({
 dailyOrderGroupStore = new Ext.data.GroupingStore({
     reader: reader,
     data: dailyOrderStore.data,
-    sortInfo:{field: 'orderDate', direction: "ASC"}
+    sortInfo: {field: 'month', direction: "ASC"},
+    groupField:'month'
 });
 
 var editor = new Ext.ux.grid.RowEditor({
     saveText: 'Update'
 });
 var groupingView = new Ext.grid.GroupingView({
-    forceFit:true,
+    forceFit: false,
     groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "Items" : "Item"]})'
 });
 
 DailyOrdersGrid = Ext.extend(Ext.grid.GridPanel, {
     height: 471,
     width: 785,
-    selectedUserId:null,
+    selectedUserId: null,
+    id: 'dailyOrderGridId',
     title: 'Daily Orders',
     store: dailyOrderGroupStore,
     plugins: [editor],
-    view:groupingView ,
+    view: groupingView,
     initComponent: function () {
         Ext.applyIf(this, {
             columns: [
@@ -90,7 +97,7 @@ DailyOrdersGrid = Ext.extend(Ext.grid.GridPanel, {
                 },
                 {
                     xtype: 'datecolumn', dataIndex: 'orderDate', header: 'OrderDate', sortable: true, width: 100, format: 'Y-m-d',
-                    editor:{
+                    editor: {
                         xtype: 'datefield',
                         allowBlank: false,
                         minValue: '2012-12-01',
@@ -98,7 +105,7 @@ DailyOrdersGrid = Ext.extend(Ext.grid.GridPanel, {
                     }
                 },
                 {
-                    xtype: 'datecolumn', dataIndex: 'orderDate', header: 'Month', sortable: true, width: 100, format: 'F'
+                    xtype: 'gridcolumn', dataIndex: 'month', header: 'Month', sortable: true, width: 100
                 }
             ]
         });
@@ -108,7 +115,7 @@ DailyOrdersGrid = Ext.extend(Ext.grid.GridPanel, {
             dailyOrderStore.load();
         }
 
-        function processDailyOrdeChanged(topic, messageFromPublisher, subscriberData){
+        function processDailyOrdeChanged(topic, messageFromPublisher, subscriberData) {
             dailyOrderStore.proxy.conn.url = './rest/dailyOrders/search?userId=' + selectedUserId;
             dailyOrderStore.load();
         }
