@@ -4,6 +4,7 @@ package com.sivalabs.springapp.entities;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import javax.persistence.*;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -66,6 +67,9 @@ public class Bill {
     private Double balanceAmount; //Should be totalAmount - paidAmount
 
     @Column
+    private Double previousMonthsBalanceAmount;
+
+    @Column
     private boolean isClosed; //True if the bill is closed after paying, should be done by admin;
 
     @Column
@@ -76,6 +80,12 @@ public class Bill {
 
     @Column
     private String comment;
+
+    @Transient
+    private String month;
+
+    @Transient
+    private Double totalAmountWithNoDiscount ;
 
     public Long getId() {
         return id;
@@ -227,5 +237,23 @@ public class Bill {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public String getMonth() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMMMM");
+        this.month = simpleDateFormat.format(this.getToDate());
+        return month;
+    }
+
+    public Double getPreviousMonthsBalanceAmount() {
+        return previousMonthsBalanceAmount;
+    }
+
+    public void setPreviousMonthsBalanceAmount(Double previousMonthsBalanceAmount) {
+        this.previousMonthsBalanceAmount = previousMonthsBalanceAmount;
+    }
+
+    public Double getTotalAmountWithNoDiscount() {
+        return totalCmPrice + totalBmPrice + otherCharges;
     }
 }

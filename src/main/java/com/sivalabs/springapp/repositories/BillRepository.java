@@ -13,6 +13,7 @@ import java.util.List;
  * Time: 8:37 PM
  */
 public interface BillRepository extends JpaRepository<Bill, Serializable> {
+    public Bill findById(Long id);
     public List<Bill> findByUserId(Long userId);
 
     //@Query("select b from Bill b where MONTH(?1) ")

@@ -44,4 +44,13 @@ public class BillResource {
         billMap.put("bills",bills);
         return new ResponseEntity<>(billMap, HttpStatus.OK) ;
     }
+
+    @RequestMapping(value = "/", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<Bill> updateUser(@RequestBody Bill modifiedBill) {
+        Bill actualBill = billService.findById(modifiedBill.getId());
+        modifiedBill.setUser(actualBill.getUser());
+        Bill bill = billService.update(modifiedBill);
+        return new ResponseEntity<Bill>(bill, HttpStatus.OK);
+    }
 }

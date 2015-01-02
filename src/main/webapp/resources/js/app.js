@@ -18,7 +18,6 @@ MasterViewUi = Ext.extend(Ext.Viewport, {
                         },
                         {
                             xtype: 'panel',
-                            layout: 'table',
                             frame: true,
                             title: 'Customer',
                             layout: 'vbox',

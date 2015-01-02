@@ -26,7 +26,6 @@ dailyOrderStore = new Ext.data.JsonStore({
             var gridPanel = Ext.getCmp('dailyOrderGridId');
             gridPanel.store.data = store.data;
             gridPanel.getView().refresh(true);
-            gridPanel.getView().sort
         },
         update: function (store, record, operation) {
             var changedOrderDate = record.data.orderDate.format('Y-m-d');
@@ -59,6 +58,7 @@ dailyOrderGroupStore = new Ext.data.GroupingStore({
 var editor = new Ext.ux.grid.RowEditor({
     saveText: 'Update'
 });
+
 var groupingView = new Ext.grid.GroupingView({
     forceFit: false,
     groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "Items" : "Item"]})'
@@ -113,15 +113,16 @@ DailyOrdersGrid = Ext.extend(Ext.grid.GridPanel, {
             dailyOrderStore.proxy.conn.url = './rest/dailyOrders/search?userId=' + messageFromPublisher.id;
             selectedUserId = messageFromPublisher.id;
             dailyOrderStore.load();
+            Ext.getCmp('dailyOrderGridId').setTitle(messageFromPublisher.data.name+"'s daily orders")
         }
 
-        function processDailyOrdeChanged(topic, messageFromPublisher, subscriberData) {
+        function processDailyOrderChanged(topic, messageFromPublisher, subscriberData) {
             dailyOrderStore.proxy.conn.url = './rest/dailyOrders/search?userId=' + selectedUserId;
             dailyOrderStore.load();
         }
 
         PageBus.subscribe("CustomerListGrid.customer.selected", this, processSelectedCustomer, 'DailyOrderGrid');
-        PageBus.subscribe("DailyOrderGrid.DailyOrder.modified", this, processDailyOrdeChanged, 'DailyOrderGrid');
+        PageBus.subscribe("DailyOrderGrid.DailyOrder.modified", this, processDailyOrderChanged, 'DailyOrderGrid');
         DailyOrdersGrid.superclass.initComponent.call(this);
     }
 });

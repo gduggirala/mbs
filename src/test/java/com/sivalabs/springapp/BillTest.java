@@ -14,6 +14,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.time.LocalDate;
@@ -42,7 +44,7 @@ public class BillTest {
     @Test
     public void testGenerateUserBill() {
         LocalDate localDate = LocalDate.now();
-        List<Bill> billsList = billService.generateCustomerBills(localDate.getMonth(), localDate.getYear());
+        List<Bill> billsList = billService.generateCustomerBills(localDate.getMonth().minus(1), localDate.getYear()-1);
         Assert.notEmpty(billsList);
     }
 
@@ -79,4 +81,20 @@ public class BillTest {
         System.out.println("Local date is " + localDate);
         System.out.println("Local date's month -1 is " + localDate.minusMonths(1));
     }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Test
+    public void testRecalculateBillByDiscount(){
+        List<Bill> billList = billService.findAllBills();
+        if(billList!=null && !billList.isEmpty()){
+            Bill bill = billList.get(0);
+            bill.setDiscount(100.0);
+            Double totalAmount = bill.getTotalAmount();
+            billRepository.saveAndFlush(bill);
+            Bill updatedBill = billService.recalculateUserBill(bill.getId());
+            Double totalAmountAfterDiscount = updatedBill.getTotalAmount();
+            Assert.isTrue(totalAmount.doubleValue() != totalAmountAfterDiscount.doubleValue(),"Amount should not match..");
+        }
+    }
+
 }

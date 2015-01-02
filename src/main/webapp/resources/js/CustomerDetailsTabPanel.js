@@ -13,7 +13,7 @@ CustomerDetailsTabPanel = Ext.extend(Ext.TabPanel, {
                     tbar: [
                         {xtype: 'button', text: 'Edit', iconCls: 'silk-user-edit', handler: editUser},
                         '-',
-                        {xtype: 'button', text: 'Activate/Inactivate', id: 'activateOrInactivateId', handler: acitivateOrDeactivateUser},
+                        {xtype: 'button', text: 'Activate/Inactivate', id: 'activateOrInactivateId', handler: activateOrDeactivateUser},
                         '-'
                     ]
                 },
@@ -50,9 +50,7 @@ CustomerDetailsTabPanel = Ext.extend(Ext.TabPanel, {
             //this.selectedCustomerRecordId = messageFromPublisher.id;
             Ext.getCmp('customerDetailsTabPanelId').selectedCustomerRecord = messageFromPublisher.data;
             Ext.getCmp('customerDetailsTabPanelId').selectedCustomerRecord.id = messageFromPublisher.id;
-            //this.selectedCustomerRecord.defineProperty('id',messageFromPublisher.id);
             var infoPanel = this.getItem(0);
-            this.setActiveTab(0);
             tpl.overwrite(infoPanel.body, messageFromPublisher.data);
             var activateOrInactivateCmp = Ext.getCmp('activateOrInactivateId');
             if (messageFromPublisher.data.active === true) {
@@ -68,7 +66,7 @@ CustomerDetailsTabPanel = Ext.extend(Ext.TabPanel, {
             PageBus.publish("CustomerDetailsTabPanel.customer.editCommand", Ext.getCmp('customerDetailsTabPanelId').selectedCustomerRecord);
         }
 
-        function acitivateOrDeactivateUser() {
+        function activateOrDeactivateUser() {
             var url = '/rest/user/status/' + Ext.getCmp('customerDetailsTabPanelId').selectedCustomerRecord.id;
             Ext.Ajax.request({
                 url: url,

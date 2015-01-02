@@ -42,12 +42,17 @@ public class BillService {
         return bills;
     }
 
+    public Bill findById(Long billId) {
+        return billRepository.findById(billId);
+    }
+
     /**
      * This method is used for reporting purpose, we can use
      * the given date is used to derive the start day (which will 1) and end date
      * (Which can be 30, 31, 28 or 29)
      *
-     * @param date
+     * @param month
+     * @param year
      * @return
      */
     public List<Bill> findByMonth(Month month, int year) {
@@ -112,9 +117,9 @@ public class BillService {
         double totalCmCost = totalCmLiters * cmPrice;
         double totalBmCost = totalBmLiters * bmPrice;
         double billTotal = totalBmCost + totalCmCost;
-        LocalDate localDate = ((java.sql.Date)dateNotBefore).toLocalDate();
-        double previousMonthsBalance = getBalanceOfBill(user, localDate.minusMonths(1));
-        double grandTotal = billTotal + previousMonthsBalance;
+        double previousMonthsBalance = bill.getPreviousMonthsBalanceAmount();
+
+        double grandTotal = (billTotal + previousMonthsBalance + bill.getOtherCharges()) - bill.getDiscount();
 
         bill.setGenerationDate(Calendar.getInstance().getTime());
         bill.setTotalAmount(grandTotal);
@@ -124,8 +129,9 @@ public class BillService {
         bill.setTotalCmPrice(totalCmCost);
         bill.setBmPerQuantityPrice(user.getBmPrice());
         bill.setCmPerQuantityPrice(user.getCmPrice());
-        bill.setOtherCharges(previousMonthsBalance);
-        bill.setComment((previousMonthsBalance < 0 || previousMonthsBalance > 0) ? "Other Charges: Previous Month balance " + previousMonthsBalance : "Other Charges: None");
+        if (bill.isClosed()) {
+            bill.setBalanceAmount(bill.getTotalAmount() - bill.getPaidAmount());
+        }
         billRepository.save(bill);
         return bill;
     }
@@ -184,11 +190,10 @@ public class BillService {
         bill.setTotalCmPrice(totalCmCost);
         bill.setBmPerQuantityPrice(user.getBmPrice());
         bill.setCmPerQuantityPrice(user.getCmPrice());
-        bill.setOtherCharges(previousMonthsBalance);
+        bill.setPreviousMonthsBalanceAmount(previousMonthsBalance);
         bill.setComment((previousMonthsBalance < 0 || previousMonthsBalance > 0) ? "Other Charges: Previous Month balance " + previousMonthsBalance : "Other Charges: None");
         billRepository.save(bill);
         return bill;
-
     }
 
     /**
@@ -214,7 +219,7 @@ public class BillService {
      *                  Instead of returning an invalid result, the last valid day of the month, 2007-02-28, is selected instead.
      * @return
      */
-    private Bill getBillForTheMonth(User user, LocalDate localDate) {
+    public Bill getBillForTheMonth(User user, LocalDate localDate) {
         Calendar calendar = Calendar.getInstance();
         int noOfDays = localDate.lengthOfMonth();
         calendar.set(Calendar.MONTH, localDate.getMonth().getValue() - 1);
@@ -228,5 +233,11 @@ public class BillService {
         Date dateNotAfter = calendar.getTime();
 
         return billRepository.findByUserIdAndFromDateAndToDate(user.getId(), dateNotBefore, dateNotAfter);
+    }
+
+    public Bill update(Bill bill) {
+        //When the bill is being updated we have to recalculate the total and everything again..
+        billRepository.save(bill);
+        return recalculateUserBill(bill);
     }
 }
