@@ -3,16 +3,16 @@
  */
 package com.sivalabs.springapp.services;
 
-import java.util.List;
-
+import com.sivalabs.springapp.entities.User;
+import com.sivalabs.springapp.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
+import java.util.List;
 
 //import com.sivalabs.springapp.dao.UserDao;
-import com.sivalabs.springapp.entities.User;
-import com.sivalabs.springapp.repositories.UserRepository;
 
 
 /**
@@ -27,7 +27,9 @@ public class UserService
 	
 	@Autowired
 	private UserRepository userRepository;
-	
+
+    @Autowired
+    private BillService billService;
 	/*
 	@Autowired
 	public UserService(UserDao userDao) {
@@ -87,6 +89,8 @@ public class UserService
 
     public User activateOrInactivate(Long userId){
         User user = userRepository.findOne(userId);
+        //Once the user is deactivated then finalize the bill..
+        billService.finalizeBillForUser(user, new Date());
         if(user.getActive() == Boolean.TRUE){
             user.setActive(Boolean.FALSE);
         }else {

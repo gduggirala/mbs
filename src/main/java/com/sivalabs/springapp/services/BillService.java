@@ -129,7 +129,7 @@ public class BillService {
         bill.setTotalCmPrice(totalCmCost);
         bill.setBmPerQuantityPrice(user.getBmPrice());
         bill.setCmPerQuantityPrice(user.getCmPrice());
-        if (bill.isClosed()) {
+        if(bill.getPaidAmount() != null){
             bill.setBalanceAmount(bill.getTotalAmount() - bill.getPaidAmount());
         }
         billRepository.save(bill);
@@ -239,5 +239,9 @@ public class BillService {
         //When the bill is being updated we have to recalculate the total and everything again..
         billRepository.save(bill);
         return recalculateUserBill(bill);
+    }
+
+    public void finalizeBillForUser(User user, Date lastDateOfService) {
+        dailyOrderService.finalizeDailyOrderForUser(user,lastDateOfService);
     }
 }

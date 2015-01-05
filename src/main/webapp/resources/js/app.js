@@ -7,14 +7,30 @@ MasterViewUi = Ext.extend(Ext.Viewport, {
             items: [
                 {
                     xtype: 'tabpanel',
+                    id:'masterTabPanelId',
+                    autoScroll:false,
                     height: Ext.getBody().getViewSize().height,
-                    activeTab: 1,
+                    width: Ext.getBody().getViewSize().width,
+                    activeTab:0,
                     items: [
                         {
                             xtype: 'panel',
-                            layout: 'table',
-                            frame: true,
-                            title: 'Overview'
+                            layout: 'vbox',
+                            layoutConfig: {
+                                align: 'stretch',
+                                pack: 'start'
+                            },
+                            title: 'Overview',
+                            frame:true,
+                            items:[
+                                    new DailyOrderReportsChart(),
+                                {
+                                    xtype: 'panel',
+                                    frame: true,
+                                    title: 'Paid to unpaid',
+                                    flex: 1
+                                }
+                            ]
                         },
                         {
                             xtype: 'panel',

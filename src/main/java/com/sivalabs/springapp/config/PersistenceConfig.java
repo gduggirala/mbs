@@ -4,11 +4,6 @@
 package com.sivalabs.springapp.config;
 
 
-import java.util.Properties;
-
-import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
-
 import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +21,10 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  * @author Siva
@@ -99,5 +98,6 @@ public class PersistenceConfig {
 		dataSourceInitializer.setDatabasePopulator(databasePopulator);
 		dataSourceInitializer.setEnabled(Boolean.parseBoolean(initDatabase));
 		return dataSourceInitializer;
-	}	
+	}
+
 }

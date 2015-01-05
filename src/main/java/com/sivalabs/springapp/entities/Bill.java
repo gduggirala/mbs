@@ -85,7 +85,10 @@ public class Bill {
     private String month;
 
     @Transient
-    private Double totalAmountWithNoDiscount ;
+    private Double billableAmount;
+
+    @Transient
+    private Double payableAmount;
 
     public Long getId() {
         return id;
@@ -253,7 +256,13 @@ public class Bill {
         this.previousMonthsBalanceAmount = previousMonthsBalanceAmount;
     }
 
-    public Double getTotalAmountWithNoDiscount() {
-        return totalCmPrice + totalBmPrice + otherCharges;
+    public Double getBillableAmount() {
+        //Billable amount
+        return (totalCmPrice==null?0:totalCmPrice) + (totalBmPrice==null?0:totalBmPrice) + (otherCharges==null?0:otherCharges);
+    }
+
+    public Double getPayableAmount() {
+        return ((totalCmPrice==null?0:totalCmPrice) + (totalBmPrice==null?0:totalBmPrice) + (otherCharges==null?0:otherCharges)) -
+                ((discount==null?0:discount) + (previousMonthsBalanceAmount==null?0:previousMonthsBalanceAmount) + (paidAmount==null?0:paidAmount));
     }
 }

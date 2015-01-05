@@ -21,7 +21,8 @@ var reader = new Ext.data.ArrayReader({}, [
     {name: 'closed', type: 'boolean'},
     {name: 'month', type: 'string'},
     {name: 'previousMonthsBalanceAmount', type: 'float'},
-    {name: 'totalAmountWithNoDiscount', type: 'float'}
+    {name: 'billableAmount', type: 'float'},
+    {name: 'payableAmount', type: 'float'}
 ]);
 
 customerBillListStore = new Ext.data.JsonStore({
@@ -51,7 +52,8 @@ customerBillListStore = new Ext.data.JsonStore({
         {name: 'closed', type: 'boolean'},
         {name: 'month', type: 'string'},
         {name: 'previousMonthsBalanceAmount', type: 'float'},
-        {name: 'totalAmountWithNoDiscount', type: 'float'}
+        {name: 'billableAmount', type: 'float'},
+        {name: 'payableAmount', type: 'float'}
     ],
     listeners: {
         load: function (store, records, options) {
@@ -97,10 +99,12 @@ billGridRowExpander = new Ext.ux.grid.RowExpander({
         '<tr><td><b>CM</b></td><td>{totalCmQty}</td><td>{cmPerQuantityPrice}</td><td><b>{totalCmPrice}</b></td></tr>',
         '<tr><td><b>BM</b></td><td>{totalBmQty}</td><td>{bmPerQuantityPrice}</td><td><b>{totalBmPrice}</b></td></tr>',
         '<tr><td><b>Others</b></td><td></td><td></td><td>{otherCharges}</td></tr>',
-        '<tr><td></td><td></td><td><b>Total</b></td><td><b>{totalAmountWithNoDiscount}</b></td></tr></table>',
-        '<br /><p><b>Discount:</b>{discount}</p>',
+        '<tr><td></td><td></td><td><b>Billable Amount</b></td><td><b>{billableAmount}</b></td></tr></table>',
+        '<br />',
+        '<p><b>Discount:</b>{discount}</p>',
+        '<p><b>Paid Amount:</b>{paidAmount}</p>',
         '<p><b>Previous months balance:</b>{previousMonthsBalanceAmount}</p>',
-        '<p><b>Bill Paid?:</b><tpl if="closed">Yes</tpl><tpl if="!closed">No</tpl></p>'
+        '<p><b>Payable Amount:</b>{payableAmount}</p>'
     )
 });
 
@@ -142,7 +146,7 @@ CustomerBillGrid = Ext.extend(Ext.grid.GridPanel, {
                         maxValue: 150000
                     }
                 },
-                {xtype: 'numbercolumn', dataIndex: 'totalAmount', header: 'Tot. Amt.', sortable: true},
+                {xtype: 'numbercolumn', dataIndex: 'billableAmount', header: 'Billable Amt.', sortable: true},
                 {xtype: 'numbercolumn', dataIndex: 'paidAmount', header: 'Paid Amt.', sortable: true,
                     editor: {
                         xtype: 'numberfield',
@@ -168,8 +172,8 @@ CustomerBillGrid = Ext.extend(Ext.grid.GridPanel, {
                         maxValue: 150000
                     }
                 },
-                {xtype: 'checkcolumn', dataIndex: 'closed', header: 'Paid?', sortable: true
-                },
+                /*{xtype: 'checkcolumn', dataIndex: 'closed', header: 'Paid?', sortable: true
+                },*/
                 {xtype: 'gridcolumn', dataIndex: 'month', header: 'Month', sortable: true}
             ]
         });
@@ -177,13 +181,13 @@ CustomerBillGrid = Ext.extend(Ext.grid.GridPanel, {
             customerBillListStore.proxy.conn.url = '/rest/bill/user/' + messageFromPublisher.id;
             selectedUserId = messageFromPublisher.id;
             customerBillListStore.load();
-            Ext.getCmp('customerBillGridId').setTitle(messageFromPublisher.data.name + "'s bill")
+            Ext.getCmp('customerBillGridId').setTitle(messageFromPublisher.data.name + "'s bill");
+
         }
 
         function processBillChanged(topic, messageFromPublisher, subscriberData) {
             customerBillListStore.proxy.conn.url = './rest/bill/user/' + selectedUserId;
             customerBillListStore.load();
-
         }
 
         PageBus.subscribe("CustomerListGrid.customer.selected", this, processSelectedCustomer, 'BillGrid');

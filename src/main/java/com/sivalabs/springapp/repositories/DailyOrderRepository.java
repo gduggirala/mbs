@@ -18,4 +18,5 @@ public interface DailyOrderRepository extends JpaRepository<DailyOrder, Serializ
     public DailyOrder findByUserIdAndOrderDate(Long userId, Date orderDate);
     public List<DailyOrder> findByOrderDate(Date orderDate);
     public DailyOrder findById(Long id);
+    public List<DailyOrder> findByUserIdAndOrderDateGreaterThan(Long userId,Date orderDate);
 }
