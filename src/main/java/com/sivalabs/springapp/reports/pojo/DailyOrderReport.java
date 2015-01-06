@@ -9,6 +9,8 @@ package com.sivalabs.springapp.reports.pojo;
 public class DailyOrderReport {
     private Double totalCmOrder;
     private Double totalBmOrder;
+    private Double bmRevenue;
+    private Double cmRevenue;
     private String sector;
 
     public Double getTotalCmOrder() {
@@ -33,5 +35,21 @@ public class DailyOrderReport {
 
     public void setSector(String sector) {
         this.sector = sector;
+    }
+
+    public Double getBmRevenue() {
+        return bmRevenue;
+    }
+
+    public void setBmRevenue(Double bmRevenue) {
+        this.bmRevenue = bmRevenue;
+    }
+
+    public Double getCmRevenue() {
+        return cmRevenue;
+    }
+
+    public void setCmRevenue(Double cmRevenue) {
+        this.cmRevenue = cmRevenue;
     }
 }

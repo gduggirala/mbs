@@ -16,6 +16,8 @@ import java.time.Month;
 public class AppScheduler {
     @Autowired
     BillService billService;
+    @Autowired
+    DailyOrderService dailyOrderService;
 
     /**
      * This will fire at 11:15 PM on the last day of every month
@@ -24,5 +26,11 @@ public class AppScheduler {
     public void generateMonthlyBill(){
         LocalDate localDate = LocalDate.now();
         billService.generateCustomerBills(localDate.getMonth(), localDate.getYear());
+    }
+
+    @Scheduled(cron = "30 2 * * * ?")
+    public void generateDailyOrder(){
+        LocalDate localDate = LocalDate.now();
+        dailyOrderService.createDailyOrdersForAllActiveUsers();
     }
 }

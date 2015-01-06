@@ -10,14 +10,64 @@ var customerListStore = new Ext.data.JsonStore({
         {name: 'phone',type: 'string'},{name: 'address1',type: 'string'},{name: 'address2',type: 'string'},
         {name: 'address3',type: 'string'},{name: 'city',type: 'string'},{name: 'zip',type: 'string'},
         {name: 'dailyCmOrder',type: 'float'},{name: 'dailyBmOrder',type: 'float'},
-        {name: 'cmPrice',type: 'float'},{name: 'bmPrice',type: 'float'},{name: 'active',type: 'boolean'}
-    ]
+        {name: 'cmPrice',type: 'float'},{name: 'bmPrice',type: 'float'},{name: 'active',type: 'boolean'},{name: 'givenSerialNumber',type: 'int'}
+    ],
+    listeners:{
+        load:function(store, records,options){
+            var gridPanel = Ext.getCmp('customerListGridId');
+            gridPanel.store.data = store.data;
+            gridPanel.getView().refresh(true);
+        },
+        update: function (store, record, operation) {
+            var values = record.data;
+            var jsonValues = Ext.encode(values);
+            Ext.Ajax.request({
+                url: '/rest/user/',
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json; charset=utf-8'},
+                success: function (response, opts) {
+                    PageBus.publish("CustomerListGrid.CustomerList.modified", record.data);
+                },
+                failure: function (response, opts) {
+                    console.log('server-side failure with status code ' + response.status);
+                },
+                params: jsonValues
+            });
+        }
+    }
+});
+
+var reader = new Ext.data.ArrayReader({}, [
+    {name: 'name',type: 'string'},{name: 'email',type: 'string'},{name: 'sector',type: 'string'},
+    {name: 'phone',type: 'string'},{name: 'address1',type: 'string'},{name: 'address2',type: 'string'},
+    {name: 'address3',type: 'string'},{name: 'city',type: 'string'},{name: 'zip',type: 'string'},
+    {name: 'dailyCmOrder',type: 'float'},{name: 'dailyBmOrder',type: 'float'},
+    {name: 'cmPrice',type: 'float'},{name: 'bmPrice',type: 'float'},{name: 'active',type: 'boolean'},{name: 'givenSerialNumber',type: 'int'}
+]);
+
+var groupingView = new Ext.grid.GroupingView({
+    forceFit: false,
+    groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "Items" : "Item"]})'
+});
+
+var editor = new Ext.ux.grid.RowEditor({
+    saveText: 'Update'
+});
+
+customerListGroupStore = new Ext.data.GroupingStore({
+    reader: reader,
+    data: customerListStore.data,
+    sortInfo: {field: 'sector', direction: "ASC"},
+    groupField:'sector'
 });
 
 CustomerListGrid = Ext.extend(Ext.grid.GridPanel, {
     title: 'Customer List',
-    store: customerListStore,
+    store: customerListGroupStore,
+    id:'customerListGridId',
     stripeRows:true,
+    view: groupingView,
+    plugins: [editor],
     initComponent: function() {
         Ext.applyIf(this, {
             selModel: new Ext.grid.RowSelectionModel({
@@ -38,19 +88,63 @@ CustomerListGrid = Ext.extend(Ext.grid.GridPanel, {
             },'-'],
             columns: [
                 new Ext.grid.RowNumberer(),
-                {xtype: 'gridcolumn',dataIndex: 'name',header: 'Name',sortable: true},
-                {xtype: 'gridcolumn',dataIndex: 'email',header: 'Email',sortable: true},
-                {xtype: 'gridcolumn',dataIndex: 'sector',header: 'Sector',sortable: true},
-                {xtype: 'gridcolumn',dataIndex: 'phone',header: 'Phone',sortable: true},
-                {xtype: 'numbercolumn',dataIndex: 'dailyCmOrder',header: 'Daily CM Order',sortable: true},
-                {xtype: 'numbercolumn',dataIndex: 'dailyBmOrder',header: 'Daily BM Order',sortable: true},
-                {xtype: 'numbercolumn',dataIndex: 'cmPrice',header: 'CM Price',sortable: true},
-                {xtype: 'numbercolumn',dataIndex: 'bmPrice',header: 'BM Price',sortable: true},
-                {xtype: 'gridcolumn',dataIndex: 'address1',header: 'Address 1',sortable: true},
+                {xtype: 'gridcolumn',dataIndex: 'name',header: 'Name',sortable: true,
+                    editor: {xtype: 'textfield',allowBlank: false}
+                },
+                {xtype: 'gridcolumn',dataIndex: 'email',header: 'Email',sortable: true,
+                    editor: {xtype: 'textfield',allowBlank: false}
+                },
+                {xtype: 'gridcolumn',dataIndex: 'sector',header: 'Sector',sortable: true,
+                    editor: {xtype: 'textfield',allowBlank: false}
+                },
+                {xtype: 'gridcolumn',dataIndex: 'phone',header: 'Phone',sortable: true,
+                    editor: {xtype: 'textfield',allowBlank: false}
+                },
+                {xtype: 'numbercolumn',dataIndex: 'dailyCmOrder',header: 'Daily CM Order',sortable: true,
+                    editor: {
+                        xtype: 'numberfield',
+                        allowBlank: false,
+                        minValue: 0,
+                        maxValue: 150000
+                    }
+                },
+                {xtype: 'numbercolumn',dataIndex: 'dailyBmOrder',header: 'Daily BM Order',sortable: true,
+                    editor: {
+                        xtype: 'numberfield',
+                        allowBlank: false,
+                        minValue: 0,
+                        maxValue: 150000
+                    }
+                },
+                {xtype: 'numbercolumn',dataIndex: 'cmPrice',header: 'CM Price',sortable: true,
+                    editor: {
+                        xtype: 'numberfield',
+                        allowBlank: false,
+                        minValue: 0,
+                        maxValue: 150000
+                    }
+                },
+                {xtype: 'numbercolumn',dataIndex: 'bmPrice',header: 'BM Price',sortable: true,
+                    editor: {
+                        xtype: 'numberfield',
+                        allowBlank: false,
+                        minValue: 0,
+                        maxValue: 150000
+                    }
+                },
+              /*  {xtype: 'gridcolumn',dataIndex: 'address1',header: 'Address 1',sortable: true},
                 {xtype: 'gridcolumn',dataIndex: 'address2',header: 'Address 2',sortable: true},
                 {xtype: 'gridcolumn',dataIndex: 'address3',header: 'Address 3',sortable: true},
                 {xtype: 'gridcolumn',dataIndex: 'city',header: 'City',sortable: true},
-                {xtype: 'gridcolumn',dataIndex: 'zip',header: 'Zip',sortable: true}
+                {xtype: 'gridcolumn',dataIndex: 'zip',header: 'Zip',sortable: true}, */
+                {xtype: 'numbercolumn',dataIndex: 'givenSerialNumber',header: 'Serial #',sortable: true,
+                    editor: {
+                        xtype: 'numberfield',
+                        allowBlank: false,
+                        minValue: 0,
+                        maxValue: 150000
+                    }
+                }
             ],
             listeners:{
                 'viewready':function(grid){
@@ -150,7 +244,8 @@ CreateCustomerForm = Ext.extend(Ext.form.FormPanel, {
                         {xtype: 'textfield',id: 'address2',name: 'address2',fieldLabel: 'Address 2'},
                         {xtype: 'textfield',id: 'address3',name: 'address3',fieldLabel: 'Address 3'},
                         {xtype: 'textfield',id: 'city',name: 'city',fieldLabel: 'City'},
-                        {xtype: 'textfield',id: 'zip',name: 'zip',fieldLabel: 'Zip'}
+                        {xtype: 'numberfield',id: 'zip',name: 'zip',fieldLabel: 'Zip'},
+                        {xtype: 'numberfield',id: 'givenSerialNumber',name: 'givenSerialNumber',fieldLabel: 'Serial #'}
                     ]
                 }
             ],

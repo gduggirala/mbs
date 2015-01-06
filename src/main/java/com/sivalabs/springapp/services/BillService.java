@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
@@ -57,7 +58,7 @@ public class BillService {
      */
     public List<Bill> findByMonth(Month month, int year) {
         LocalDate localDate = LocalDate.of(year, month, 1);
-        int noOfDays = localDate.getDayOfMonth();
+        int noOfDays = localDate.lengthOfMonth();
 
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.MONTH, localDate.getMonth().getValue() - 1);

@@ -50,6 +50,8 @@ public class User {
     private Double bmPrice;
     @Column
     private Boolean isActive;
+    @Column
+    private Integer givenSerialNumber;
 
     @Temporal(TemporalType.DATE)
     @Column(nullable = true)
@@ -225,5 +227,13 @@ public class User {
 
     public void setOrderStartDate(Date orderStartDate) {
         this.orderStartDate = orderStartDate;
+    }
+
+    public Integer getGivenSerialNumber() {
+        return givenSerialNumber;
+    }
+
+    public void setGivenSerialNumber(Integer givenSerialNumber) {
+        this.givenSerialNumber = givenSerialNumber;
     }
 }

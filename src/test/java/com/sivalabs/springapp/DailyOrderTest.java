@@ -16,6 +16,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
@@ -54,6 +55,11 @@ public class DailyOrderTest {
         user.setSector("Sector");
         user.setPhone("1112223333");
         user.setActive(Boolean.TRUE);
+        user.setOrderStartDate(new Date());
+        user.setDailyCmOrder((double) 1);
+        user.setDailyBmOrder((double) 1);
+        user.setBmPrice((double) 55);
+        user.setCmPrice(45d);
         User savedUser = userService.create(user);
         assertNotNull("User just got saved there should be ID associated", user.getId());
         User newUser = userService.findUserById(savedUser.getId());
@@ -83,7 +89,7 @@ public class DailyOrderTest {
     @Test
     @Transactional
     @Rollback(true)
-    public void testOrderDateBetween(){
+    public void testOrderDateBetween() {
         LocalDate localDate = LocalDate.of(2012, Month.FEBRUARY, 1);
         int noOfDays = localDate.getMonth().length(localDate.isLeapYear());
         for (int i = 1; i <= noOfDays; i++) {
@@ -109,14 +115,14 @@ public class DailyOrderTest {
         Date dateNotAfter = calendar.getTime();
 
         List<DailyOrder> dailyOrders = dailyOrderService.findByUserIdAndOrderDateBetween(user.getId(), dateNotBefore, dateNotAfter);
-        Assert.isTrue(dailyOrders != null,"Daily orders cannot be null");
-        Assert.isTrue(dailyOrders.size()==noOfDays,"Size of the return value should be equal to No. of days");
+        Assert.isTrue(dailyOrders != null, "Daily orders cannot be null");
+        Assert.isTrue(dailyOrders.size() == noOfDays, "Size of the return value should be equal to No. of days");
     }
 
     @Test
     @Transactional
     @Rollback(true)
-    public void testCreateDailyOrdersForAllActiveUsers(){
+    public void testCreateDailyOrdersForAllActiveUsers() {
         dailyOrderService.createDailyOrdersForAllActiveUsers();
         List<DailyOrder> dailyOrders = dailyOrderService.findAllDailyOrders();
         Assert.notEmpty(dailyOrders);
@@ -125,7 +131,7 @@ public class DailyOrderTest {
     @Test
     @Transactional
     @Rollback(true)
-    public void testCreateOrUpdateDailyOrder(){
+    public void testCreateOrUpdateDailyOrder() {
         LocalDate dateOfMonth = LocalDate.now();
         Instant instant = dateOfMonth.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
         DailyOrder dailyOrder = new DailyOrder();
@@ -140,5 +146,54 @@ public class DailyOrderTest {
 
         Assert.isTrue(dailyOrder.getBmOrder() != oldBmOrder);
         Assert.isTrue(dailyOrder.getCmOrder() != oldCmOrder);
+    }
+
+    @Test
+    @Transactional
+    @Rollback(true)
+    public void testFinalizeDailyOrderForUser() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_MONTH, -3);
+        user.setOrderStartDate(calendar.getTime());
+        userService.update(user);
+        dailyOrderService.createDailyOrderForUser(user);
+        List<DailyOrder> dailyOrderList = dailyOrderService.findByUserId(user.getId());
+        int initialLength = dailyOrderList.size();
+        Assert.notEmpty(dailyOrderList, "Daily order list cannot be empty");
+        dailyOrderService.finalizeDailyOrderForUser(user, new Date());
+        List<DailyOrder> finalizedDailyOrderList = dailyOrderService.findByUserId(user.getId());
+        int postLength = finalizedDailyOrderList.size();
+        Assert.isTrue(postLength == initialLength, "Post length and initial length should be equal");
+        calendar.add(Calendar.DAY_OF_MONTH, +6);
+        Assert.notEmpty(finalizedDailyOrderList);
+    }
+
+    @Test
+   // @Transactional
+    public void testCreatePreviousMonthsDailyOrders() {
+        List<User> userList = userService.findByIsActiveTrue();
+        for (User user : userList) {
+            LocalDate localDate1 = LocalDate.now();
+            LocalDate localDate = localDate1.minusMonths(1);
+            user.setOrderStartDate(DateUtils.asDate(localDate));
+            int noOfDays = localDate.lengthOfMonth();
+            if (user.getDailyBmOrder() != null && user.getDailyCmOrder() != null) {
+                for (int i = 1; i <= noOfDays; i++) {
+                    //First check if there is any order existing for the day
+                    LocalDate dateOfMonth = LocalDate.of(localDate.getYear(), localDate.getMonth(), i);
+                    Instant instant = dateOfMonth.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
+                    Date orderDate = Date.from(instant);
+                    DailyOrder dailyOrder = dailyOrderRepository.findByUserIdAndOrderDate(user.getId(), orderDate);
+                    if (dailyOrder == null && user.getOrderStartDate().compareTo(orderDate) <= 0) {
+                        dailyOrder = new DailyOrder();
+                        dailyOrder.setUser(user);
+                        dailyOrder.setCmOrder(user.getDailyCmOrder());
+                        dailyOrder.setBmOrder(user.getDailyBmOrder());
+                        dailyOrder.setOrderDate(orderDate);
+                        dailyOrderRepository.save(dailyOrder);
+                    }
+                }
+            }
+        }
     }
 }

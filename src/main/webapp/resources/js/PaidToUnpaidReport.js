@@ -1,16 +1,16 @@
-DailyOrderReportsChart = Ext.extend(Ext.Panel, {
+PaidToUnpaidReport = Ext.extend(Ext.Panel, {
     autoScroll: true,
     layoutConfig:{
         align:'middle'
     },
-    id: 'dailyOrderReportsChartId',
+    id: 'paidToUnpaidReportId',
     frame: true,
-    title: 'Daily Orders Report',
+    title: 'Paid to Unpaid Reports',
     flex: 1,
     html: 'Loading...',
     listeners: {
         render: function (thisPanel) {
-            dailyOrderReporter();
+            paidToUnpaidBillReport();
         }
     },
     initComponent: function () {
@@ -19,35 +19,32 @@ DailyOrderReportsChart = Ext.extend(Ext.Panel, {
 
             ]
         });
-        function dailyOrderChanged(topic, messageFromPublisher, subscriberData) {
-            dailyOrderReporter();
+        function billChanged(topic, messageFromPublisher, subscriberData) {
+            paidToUnpaidBillReport();
         }
 
-        PageBus.subscribe("DailyOrderGrid.DailyOrder.modified", this, dailyOrderChanged, 'DailyOrderChart');
+        PageBus.subscribe("CustomerBillGrid.Bill.modified", this, billChanged, 'BillGridChart');
         DailyOrderReportsChart.superclass.initComponent.call(this);
     }
 });
 
-function dailyOrderReporter() {
+function paidToUnpaidBillReport() {
     Ext.Ajax.request({
-        url: '/rest/report/dailyOrderReport',
+        url: '/rest/report/monthlyBills',
         method: 'GET',
         headers: {'Content-Type': 'application/json; charset=utf-8'},
         success: function (response, opts) {
             console.dir(response.responseText);
             var data = Ext.decode(response.responseText)
             var tpl = new Ext.XTemplate(
-                '<table border="1" style="width:100%"><tr bgcolor="#C8C8C8"><td><b>Sector</b></td><td><b>BM Order</b></td><td><b>BM Revenue</b></td><td><b>CM Order</b></td><td><b>CM Revenue</b></td></tr>',
-                '<tpl for="dailyOrderReport">',
-                '<tr><td bgcolor="#C8C8C8"><b>{sector}</b></td><td>{totalBmOrder}</td><td>{bmRevenue}</td><td>{totalCmOrder}</td><td>{cmRevenue}</td></tr>',
-                '</tpl>',
-                '<tr bgcolor="#C8C8C8"><td><b>Total</b></td><td><b>{grandTotalBmOrder}</b></td><td><b>{totalBmRevenue}</b></td><td><b>{grandTotalCmOrder}</b></td><td><b>{totalCmRevenue}</b></td></tr>',
-                '<tr bgcolor="#C8C8C8"><td><b>Grand Total Revenue</b></td><td colspan="4"><b>{totalMilkRevenue}</b></td></tr>',
-                '</table> '
+                '<table border="1" style="width:100%"><tr bgcolor="#C8C8C8">',
+                '<td><b># Of Paid Bills</b></td><td><b>Total Paid amount</b></td><td><b># Of Unpaid Bills</b></td><td><b>Total Unpaid amount</b></td><td><b>Yet to Pay</b></td></tr>',
+                '<tr bgcolor="#C8C8C8"><td><b>{paidBillsCount}</b></td><td><b>{paidAmount}</b></td><td><b>{unpaidBillsCount}</b></td><td><b>{unpaidAmount}</b></td><td><b>{amountYetToBePaid}</b></td></tr>',
+                '</table>'
             );
-            var panel = Ext.getCmp('dailyOrderReportsChartId');
+            var panel = Ext.getCmp('paidToUnpaidReportId');
             var panelBody = panel.body;
-            panel.setTitle("Order for date "+data.forDate);
+            panel.setTitle("Bill for month "+data.forMonth);
             tpl.overwrite(panelBody, data);
         },
         failure: function (response, opts) {

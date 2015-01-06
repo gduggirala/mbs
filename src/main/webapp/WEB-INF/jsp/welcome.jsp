@@ -19,6 +19,7 @@
     <script type="text/javascript" src="${rootURL}resources/js/DailyOrderGrid.js"></script>
     <script type="text/javascript" src="${rootURL}resources/js/BillGrid.js"></script>
     <script type="text/javascript" src="${rootURL}resources/js/DailyOrderReportsChart.js"></script>
+    <script type="text/javascript" src="${rootURL}resources/js/PaidToUnpaidReport.js"></script>
     <script type="text/javascript" src="${rootURL}resources/js/app.js"></script>
 
     <script type="text/javascript">

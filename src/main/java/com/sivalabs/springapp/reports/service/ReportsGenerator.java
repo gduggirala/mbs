@@ -23,8 +23,6 @@ public class ReportsGenerator {
     @Autowired
     private DataSource dataSource;
 
-    private JdbcTemplate jdbcTemplate;
-
 
     public List<DailyOrderReport> generateDailyOrderReport(Date date) throws SQLException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -34,12 +32,12 @@ public class ReportsGenerator {
 
     public List<DailyOrderReport> generateDailyOrderReport(String formattedDate) throws SQLException {
 
-        String sql = "SELECT sum(d0.bmOrder) AS 'totalBmOrder', sum(d0.cmOrder) AS 'totalCmOrder', u.sector AS 'sector'" +
-                " FROM daily_order d0" +
-                " INNER JOIN users u ON d0.user_Id=u.id" +
-                " WHERE orderDate = ? and u.isActive=true" +
+        String sql = "SELECT sum(d0.bmOrder) AS 'totalBmOrder', (sum(d0.bmOrder) * u.bmPrice) as 'bmRevenue',  sum(d0.cmOrder) AS 'totalCmOrder', (sum(d0.cmOrder) * u.cmPrice) as 'cmRevenue', u.sector AS 'sector'\n" +
+                " FROM daily_order d0\n" +
+                " INNER JOIN users u ON d0.user_Id=u.id\n" +
+                " WHERE orderDate = ? and u.isActive=true\n" +
                 " GROUP BY u.sector";
-        jdbcTemplate = new JdbcTemplate(dataSource);
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         List<DailyOrderReport> dailyOrderReportList = jdbcTemplate.query(sql, new Object[]{formattedDate}, new BeanPropertyRowMapper(DailyOrderReport.class));
         return dailyOrderReportList;
     }

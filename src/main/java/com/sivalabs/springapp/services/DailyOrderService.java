@@ -4,13 +4,11 @@ import com.sivalabs.springapp.DateUtils;
 import com.sivalabs.springapp.entities.DailyOrder;
 import com.sivalabs.springapp.entities.User;
 import com.sivalabs.springapp.repositories.DailyOrderRepository;
-import com.sivalabs.springapp.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -98,7 +96,7 @@ public class DailyOrderService {
     @Transactional(propagation = Propagation.REQUIRED)
     public void createDailyOrderForUser(User user) {
         LocalDate localDate = LocalDate.now();
-        int noOfDays = localDate.getDayOfMonth();
+        int noOfDays = localDate.lengthOfMonth();
         if (user.getDailyBmOrder() != null && user.getDailyCmOrder() != null) {
             for (int i = 1; i <= noOfDays; i++) {
                 //First check if there is any order existing for the day
@@ -130,17 +128,6 @@ public class DailyOrderService {
             for (DailyOrder dailyOrder : dailyOrders) {
                 dailyOrder.setBmOrder((double) 0);
                 dailyOrder.setCmOrder((double) 0);
-                dailyOrderRepository.saveAndFlush(dailyOrder);
-            }
-        } else {
-            int existingMonth = serviceLastDate.getMonthValue();
-            for (int i = (serviceLastDate.getDayOfMonth()); (i <= serviceLastDate.lengthOfMonth() && serviceLastDate.getMonthValue() == existingMonth); i++) {
-                DailyOrder dailyOrder = new DailyOrder();
-                dailyOrder.setBmOrder((double) 0);
-                dailyOrder.setCmOrder((double) 0);
-                serviceLastDate.plusDays(1);
-                Date orderDate = DateUtils.asDate(serviceLastDate);
-                dailyOrder.setOrderDate(orderDate);
                 dailyOrderRepository.saveAndFlush(dailyOrder);
             }
         }

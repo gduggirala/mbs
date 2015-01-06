@@ -21,15 +21,10 @@ MasterViewUi = Ext.extend(Ext.Viewport, {
                                 pack: 'start'
                             },
                             title: 'Overview',
-                            frame:true,
+                            frame:false,
                             items:[
                                     new DailyOrderReportsChart(),
-                                {
-                                    xtype: 'panel',
-                                    frame: true,
-                                    title: 'Paid to unpaid',
-                                    flex: 1
-                                }
+                                    new PaidToUnpaidReport()
                             ]
                         },
                         {
