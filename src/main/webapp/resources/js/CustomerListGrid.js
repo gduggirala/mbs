@@ -1,10 +1,10 @@
-var customerListStore = new Ext.data.JsonStore({
+customerListStore = new Ext.data.JsonStore({
     autoLoad: true,
     restful: true,
     storeId: 'customersStore',
     url: './rest/user/',
     root: 'users',
-    totalProperty: 'users.length',
+    totalProperty: 'total',
     fields: [
         {name: 'name',type: 'string'},{name: 'email',type: 'string'},{name: 'sector',type: 'string'},
         {name: 'phone',type: 'string'},{name: 'address1',type: 'string'},{name: 'address2',type: 'string'},
@@ -160,9 +160,10 @@ CustomerListGrid = Ext.extend(Ext.grid.GridPanel, {
             Ext.Msg.alert("Clicked on", "Delete");
         }
         function customerAdded(){
-            this.store.reload();
+            customerListStore.load();
         }
         PageBus.subscribe("CustomerListGrid.CreateCustomerForm.Added",this,customerAdded,'createAddCustomerView');
+        PageBus.subscribe("CustomerListGrid.CustomerList.modified",this,customerAdded,'createAddCustomerView');
         CustomerListGrid.superclass.initComponent.call(this);
     }
 });
