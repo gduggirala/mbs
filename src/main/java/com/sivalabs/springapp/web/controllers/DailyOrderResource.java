@@ -2,14 +2,17 @@ package com.sivalabs.springapp.web.controllers;
 
 import com.sivalabs.springapp.entities.Bill;
 import com.sivalabs.springapp.entities.DailyOrder;
+import com.sivalabs.springapp.entities.User;
 import com.sivalabs.springapp.services.BillService;
 import com.sivalabs.springapp.services.DailyOrderService;
+import com.sivalabs.springapp.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
@@ -29,6 +32,8 @@ public class DailyOrderResource {
     DailyOrderService dailyOrderService;
     @Autowired
     BillService billService;
+    @Autowired
+    UserService userService;
 
     @RequestMapping(value = "/", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -42,6 +47,17 @@ public class DailyOrderResource {
     @RequestMapping(value = "/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<Map<String, List<DailyOrder>>> findAllByUserId(@RequestParam("userId") Long id) {
+        List<DailyOrder> dailyOrders = dailyOrderService.findByUserId(id);
+        Map<String, List<DailyOrder>> dailyOrderMap = new HashMap<>();
+        dailyOrderMap.put("dailyOrders", dailyOrders);
+        return new ResponseEntity<>(dailyOrderMap, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/rerun", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<Map<String, List<DailyOrder>>> rerunDailyOrders(@RequestParam("userId") Long id) throws ParseException {
+        User user = userService.findUserById(id);
+        dailyOrderService.createDailyOrderForUser(user);
         List<DailyOrder> dailyOrders = dailyOrderService.findByUserId(id);
         Map<String, List<DailyOrder>> dailyOrderMap = new HashMap<>();
         dailyOrderMap.put("dailyOrders", dailyOrders);

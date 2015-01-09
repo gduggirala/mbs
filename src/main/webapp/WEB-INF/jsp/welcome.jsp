@@ -15,6 +15,7 @@
     <script type="text/javascript" src="${rootURL}resources/js/pageBus.js"></script>
 
     <script type="text/javascript" src="${rootURL}resources/js/CustomerListGrid.js"></script>
+    <script type="text/javascript" src="${rootURL}resources/js/DailyOrderGroundReport.js"></script>
     <script type="text/javascript" src="${rootURL}resources/js/CustomerDetailsTabPanel.js"></script>
     <script type="text/javascript" src="${rootURL}resources/js/DailyOrderGrid.js"></script>
     <script type="text/javascript" src="${rootURL}resources/js/BillGrid.js"></script>

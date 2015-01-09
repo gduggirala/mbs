@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.Month;
 
@@ -29,7 +30,7 @@ public class AppScheduler {
     }
 
     @Scheduled(cron = "30 2 * * * ?")
-    public void generateDailyOrder(){
+    public void generateDailyOrder() throws ParseException {
         LocalDate localDate = LocalDate.now();
         dailyOrderService.createDailyOrdersForAllActiveUsers();
     }

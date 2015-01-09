@@ -13382,8 +13382,8 @@ Ext.reg('datepicker', Ext.DatePicker);
  * <p>Example usage:</p>
  *<pre><code>
 // Basic mask:
-var myMask = new Ext.LoadMask(Ext.getBody(), {msg:"Please wait..."});
-myMask.show();
+var customerListGridMask = new Ext.LoadMask(Ext.getBody(), {msg:"Please wait..."});
+customerListGridMask.show();
 </code></pre>
  * @constructor
  * Create a new LoadMask

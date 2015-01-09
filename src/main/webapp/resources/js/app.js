@@ -2,29 +2,31 @@ MasterViewUi = Ext.extend(Ext.Viewport, {
 
     initComponent: function () {
         var customerListGrid = new CustomerListGrid({flex: 2});
-        var customerDetailsPanel = new CustomerDetailsTabPanel({flex:3});
+        var customerDetailsPanel = new CustomerDetailsTabPanel({flex: 3});
         Ext.applyIf(this, {
             items: [
                 {
                     xtype: 'tabpanel',
-                    id:'masterTabPanelId',
-                    autoScroll:false,
+                    id: 'masterTabPanelId',
+                    autoScroll: false,
                     height: Ext.getBody().getViewSize().height,
                     width: Ext.getBody().getViewSize().width,
-                    activeTab:0,
+                    activeTab: 0,
                     items: [
                         {
                             xtype: 'panel',
-                            layout: 'vbox',
+                            layout: 'accordion',
                             layoutConfig: {
                                 align: 'stretch',
                                 pack: 'start'
                             },
                             title: 'Overview',
-                            frame:false,
-                            items:[
-                                    new DailyOrderReportsChart(),
-                                    new PaidToUnpaidReport()
+                            frame: false,
+                            items: [
+                                new DailyOrderGroundReportGrid(),
+                                new DailyOrderReportsChart(),
+                                new PaidToUnpaidReport()
+
                             ]
                         },
                         {

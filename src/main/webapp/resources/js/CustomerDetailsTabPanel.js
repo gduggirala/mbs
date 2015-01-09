@@ -74,7 +74,6 @@ CustomerDetailsTabPanel = Ext.extend(Ext.TabPanel, {
                 headers: {'Content-Type': 'application/json; charset=utf-8'},
                 success: function (response, opts) {
                     var obj = Ext.decode(response.responseText);
-                    console.dir(obj);
                     var messageFromPublisher = {};
                     messageFromPublisher.data = obj;
                     messageFromPublisher.id = obj.id;

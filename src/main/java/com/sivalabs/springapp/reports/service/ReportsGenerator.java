@@ -1,5 +1,7 @@
 package com.sivalabs.springapp.reports.service;
 
+import com.sivalabs.springapp.DateUtils;
+import com.sivalabs.springapp.reports.pojo.DailyOrderGround;
 import com.sivalabs.springapp.reports.pojo.DailyOrderReport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -25,9 +27,7 @@ public class ReportsGenerator {
 
 
     public List<DailyOrderReport> generateDailyOrderReport(Date date) throws SQLException {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String formattedDate = simpleDateFormat.format(date);
-        return generateDailyOrderReport(formattedDate);
+        return generateDailyOrderReport(DateUtils.getAppFormattedDate(date));
     }
 
     public List<DailyOrderReport> generateDailyOrderReport(String formattedDate) throws SQLException {
@@ -40,5 +40,19 @@ public class ReportsGenerator {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         List<DailyOrderReport> dailyOrderReportList = jdbcTemplate.query(sql, new Object[]{formattedDate}, new BeanPropertyRowMapper(DailyOrderReport.class));
         return dailyOrderReportList;
+    }
+
+    public List<DailyOrderGround> generateDailyOrderGroundReport(Date date) throws SQLException{
+        return generateDailyOrderGroundReport(DateUtils.getAppFormattedDate(date));
+    }
+
+    public List<DailyOrderGround> generateDailyOrderGroundReport(String formattedDate) throws SQLException{
+        String sql ="SELECT d0.bmOrder AS 'bmOrder', d0.cmOrder AS 'cmOrder', u.sector AS 'sector', u.name AS 'name', u.phone AS 'phone', d0.orderDate AS 'orderDate', u.givenSerialNumber AS 'givenSerialNumber', u.address1 as 'address1' " +
+                "FROM daily_order d0 " +
+                "INNER JOIN users u ON d0.user_Id=u.id " +
+                "WHERE orderDate = ? AND u.isActive= TRUE";
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        List<DailyOrderGround> dailyOrderGroundList = jdbcTemplate.query(sql, new Object[]{formattedDate}, new BeanPropertyRowMapper(DailyOrderGround.class));
+        return dailyOrderGroundList;
     }
 }

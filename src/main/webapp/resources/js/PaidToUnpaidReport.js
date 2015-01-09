@@ -7,6 +7,7 @@ PaidToUnpaidReport = Ext.extend(Ext.Panel, {
     frame: true,
     title: 'Paid to Unpaid Reports',
     flex: 1,
+    collapsible:true,
     html: 'Loading...',
     listeners: {
         render: function (thisPanel) {
@@ -34,7 +35,6 @@ function paidToUnpaidBillReport() {
         method: 'GET',
         headers: {'Content-Type': 'application/json; charset=utf-8'},
         success: function (response, opts) {
-            console.dir(response.responseText);
             var data = Ext.decode(response.responseText)
             var tpl = new Ext.XTemplate(
                 '<table border="1" style="width:100%"><tr bgcolor="#C8C8C8">',
@@ -44,11 +44,11 @@ function paidToUnpaidBillReport() {
             );
             var panel = Ext.getCmp('paidToUnpaidReportId');
             var panelBody = panel.body;
-            panel.setTitle("Bill for month "+data.forMonth);
+            panel.setTitle("Paid to Unpaid report for month "+data.forMonth);
             tpl.overwrite(panelBody, data);
         },
         failure: function (response, opts) {
-
+            console.dir(response);
         }
     });
 }

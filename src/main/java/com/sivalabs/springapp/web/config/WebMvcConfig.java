@@ -8,11 +8,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
+import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import org.springframework.web.servlet.view.ResourceBundleViewResolver;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -34,16 +39,35 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter
 		registry.addViewController("admin").setViewName("admin");
 	}
 
-	@Bean
+	/*@Bean
 	public ViewResolver resolver()
 	{
 		InternalResourceViewResolver url = new InternalResourceViewResolver();
 		url.setPrefix("/WEB-INF/jsp/");
 		url.setSuffix(".jsp");
 		return url;
-	}
+	}*/
 
-	@Override
+    @Bean
+    public ViewResolver contentNegotiatingViewResolver(ContentNegotiationManager manager){
+        List<ViewResolver> resolvers = new ArrayList<ViewResolver>();
+        ResourceBundleViewResolver resourceBundleViewResolver = new ResourceBundleViewResolver();
+        resourceBundleViewResolver.setBasename("views");
+        resolvers.add(resourceBundleViewResolver);
+
+        InternalResourceViewResolver r2 = new InternalResourceViewResolver();
+        r2.setPrefix("/WEB-INF/jsp/");
+        r2.setSuffix(".jsp");
+        resolvers.add(r2);
+        // Create the CNVR plugging in the resolvers and the content-negotiation manager
+        ContentNegotiatingViewResolver resolver = new ContentNegotiatingViewResolver();
+        resolver.setViewResolvers(resolvers);
+        resolver.setContentNegotiationManager(manager);
+
+        return resolver;
+    }
+
+    @Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry)
 	{
 		registry.addResourceHandler("/resources/**").addResourceLocations("/resources/");

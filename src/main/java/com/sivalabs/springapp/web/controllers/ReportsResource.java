@@ -1,7 +1,9 @@
 package com.sivalabs.springapp.web.controllers;
 
 import ch.lambdaj.Lambda;
+import com.sivalabs.springapp.DateUtils;
 import com.sivalabs.springapp.entities.Bill;
+import com.sivalabs.springapp.reports.pojo.DailyOrderGround;
 import com.sivalabs.springapp.reports.pojo.DailyOrderReport;
 import com.sivalabs.springapp.reports.service.ReportsGenerator;
 import com.sivalabs.springapp.services.BillService;
@@ -84,4 +86,17 @@ public class ReportsResource {
         userMap.put("forMonth",localDate.minusMonths(1).getMonth().getDisplayName(TextStyle.FULL, Locale.US));
         return new ResponseEntity<>(userMap, HttpStatus.OK);
     }
+
+    @RequestMapping(value="/dailyOrderGroundReport", method= RequestMethod.GET, produces= MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> generateDailyOrderGroundReport() throws SQLException {
+        LocalDate localDate = LocalDate.now();
+        List<DailyOrderGround> dailyOrderGroundList = reportsGenerator.generateDailyOrderGroundReport(DateUtils.asDate(localDate));
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("success",Boolean.TRUE);
+        userMap.put("total",dailyOrderGroundList.size());
+        userMap.put("dailyOrderGrounds",dailyOrderGroundList);
+        return new ResponseEntity<Map<String, Object>>(userMap, HttpStatus.OK);
+    }
+
 }

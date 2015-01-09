@@ -53,6 +53,8 @@ public class UserServiceTest {
         user.setName("Some name");
         user.setSector("Sector");
         user.setPhone("1112223333");
+        user.setGivenSerialNumber(1);
+        user.setOrderStartDate(new Date());
         User savedUser = userService.create(user);
         assertNotNull("User just got saved there should be ID associated", user.getId());
         User newUser = userService.findUserById(savedUser.getId());

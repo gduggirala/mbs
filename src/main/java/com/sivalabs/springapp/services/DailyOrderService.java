@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -86,7 +87,7 @@ public class DailyOrderService {
      * 3. Only deals with current month (Assuming that this will be executed once everyday at mid night).
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void createDailyOrdersForAllActiveUsers() {
+    public void createDailyOrdersForAllActiveUsers() throws ParseException {
         List<User> users = userService.findByIsActiveTrue();
         for (User user : users) {
             createDailyOrderForUser(user);
@@ -94,17 +95,17 @@ public class DailyOrderService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void createDailyOrderForUser(User user) {
+    public void createDailyOrderForUser(User user) throws ParseException {
         LocalDate localDate = LocalDate.now();
         int noOfDays = localDate.lengthOfMonth();
         if (user.getDailyBmOrder() != null && user.getDailyCmOrder() != null) {
             for (int i = 1; i <= noOfDays; i++) {
                 //First check if there is any order existing for the day
                 LocalDate dateOfMonth = LocalDate.of(localDate.getYear(), localDate.getMonth(), i);
-                Instant instant = dateOfMonth.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
-                Date orderDate = Date.from(instant);
+                Date orderDate = DateUtils.asDate(dateOfMonth);
+
                 DailyOrder dailyOrder = dailyOrderRepository.findByUserIdAndOrderDate(user.getId(), orderDate);
-                if (dailyOrder == null && user.getOrderStartDate().compareTo(orderDate) <= 0) {
+                if (dailyOrder == null && (DateUtils.getParsedAppFormattedDate(user.getOrderStartDate()).compareTo(DateUtils.getParsedAppFormattedDate(orderDate)) <= 0)) {
                     dailyOrder = new DailyOrder();
                     dailyOrder.setUser(user);
                     dailyOrder.setCmOrder(user.getDailyCmOrder());

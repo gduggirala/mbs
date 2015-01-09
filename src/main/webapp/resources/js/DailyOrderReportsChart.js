@@ -8,6 +8,7 @@ DailyOrderReportsChart = Ext.extend(Ext.Panel, {
     title: 'Daily Orders Report',
     flex: 1,
     html: 'Loading...',
+    collapsible:true,
     listeners: {
         render: function (thisPanel) {
             dailyOrderReporter();
@@ -34,7 +35,6 @@ function dailyOrderReporter() {
         method: 'GET',
         headers: {'Content-Type': 'application/json; charset=utf-8'},
         success: function (response, opts) {
-            console.dir(response.responseText);
             var data = Ext.decode(response.responseText)
             var tpl = new Ext.XTemplate(
                 '<table border="1" style="width:100%"><tr bgcolor="#C8C8C8"><td><b>Sector</b></td><td><b>BM Order</b></td><td><b>BM Revenue</b></td><td><b>CM Order</b></td><td><b>CM Revenue</b></td></tr>',
@@ -47,7 +47,7 @@ function dailyOrderReporter() {
             );
             var panel = Ext.getCmp('dailyOrderReportsChartId');
             var panelBody = panel.body;
-            panel.setTitle("Order for date "+data.forDate);
+            panel.setTitle("Order for date "+data.forDate+" (Sector)");
             tpl.overwrite(panelBody, data);
         },
         failure: function (response, opts) {

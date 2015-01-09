@@ -1,3 +1,21 @@
+var customerListGridMask = {};
+sectorStore = {};
+var formSectorCombo = {};
+function getSectorStore(){
+    Ext.Ajax.request({
+        url: '/rest/user/sectors',
+        method: 'GET',
+        headers: {'Content-Type': 'application/json; charset=utf-8'},
+        success: function (response, opts) {
+            var temp =  Ext.decode(response.responseText);
+            sectorStore = temp.sectors;
+        },
+        failure: function (response, opts) {
+            console.log('server-side failure with status code ' + response.status);
+        }
+    });
+}
+
 customerListStore = new Ext.data.JsonStore({
     autoLoad: true,
     restful: true,
@@ -6,7 +24,7 @@ customerListStore = new Ext.data.JsonStore({
     root: 'users',
     totalProperty: 'total',
     fields: [
-        {name: 'name',type: 'string'},{name: 'email',type: 'string'},{name: 'sector',type: 'string'},
+        {name: 'name',type: 'string'},{name: 'email',type: 'string'},{name: 'sector',type: 'string'},{name:'orderStartDate',type:'date',format:'Y-m-d'},
         {name: 'phone',type: 'string'},{name: 'address1',type: 'string'},{name: 'address2',type: 'string'},
         {name: 'address3',type: 'string'},{name: 'city',type: 'string'},{name: 'zip',type: 'string'},
         {name: 'dailyCmOrder',type: 'float'},{name: 'dailyBmOrder',type: 'float'},
@@ -21,14 +39,18 @@ customerListStore = new Ext.data.JsonStore({
         update: function (store, record, operation) {
             var values = record.data;
             var jsonValues = Ext.encode(values);
+            var customerListGridMaskUpdate = new Ext.LoadMask(Ext.getCmp('customerListGridId').getEl(), {msg:"Please wait..."})
+            customerListGridMaskUpdate.show();
             Ext.Ajax.request({
                 url: '/rest/user/',
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json; charset=utf-8'},
                 success: function (response, opts) {
+                    customerListGridMaskUpdate.hide();
                     PageBus.publish("CustomerListGrid.CustomerList.modified", record.data);
                 },
                 failure: function (response, opts) {
+                    customerListGridMaskUpdate.hide();
                     console.log('server-side failure with status code ' + response.status);
                 },
                 params: jsonValues
@@ -42,6 +64,7 @@ var reader = new Ext.data.ArrayReader({}, [
     {name: 'phone',type: 'string'},{name: 'address1',type: 'string'},{name: 'address2',type: 'string'},
     {name: 'address3',type: 'string'},{name: 'city',type: 'string'},{name: 'zip',type: 'string'},
     {name: 'dailyCmOrder',type: 'float'},{name: 'dailyBmOrder',type: 'float'},
+    {name:'orderStartDate',type:'date',format:'Y-m-d'},
     {name: 'cmPrice',type: 'float'},{name: 'bmPrice',type: 'float'},{name: 'active',type: 'boolean'},{name: 'givenSerialNumber',type: 'int'}
 ]);
 
@@ -88,6 +111,15 @@ CustomerListGrid = Ext.extend(Ext.grid.GridPanel, {
             },'-'],
             columns: [
                 new Ext.grid.RowNumberer(),
+                {xtype: 'numbercolumn',dataIndex: 'givenSerialNumber',header: 'Serial #',format:'0', sortable: true,
+                    editor: {
+                        xtype: 'numberfield',
+                        allowBlank: false,
+                        allowDecimals:false,
+                        minValue: 0,
+                        maxValue: 150000
+                    }
+                },
                 {xtype: 'gridcolumn',dataIndex: 'name',header: 'Name',sortable: true,
                     editor: {xtype: 'textfield',allowBlank: false}
                 },
@@ -132,19 +164,20 @@ CustomerListGrid = Ext.extend(Ext.grid.GridPanel, {
                         maxValue: 150000
                     }
                 },
+                {
+                    xtype: 'datecolumn', dataIndex: 'orderStartDate', header: 'Order Start Date', sortable: true, width: 100, format: 'Y-m-d',
+                    editor: {
+                        xtype: 'datefield',
+                        allowBlank: false,
+                        minValue: '2012-12-01',
+                        minText: 'Can\'t have a start date before the company existed!'
+                    }
+                }
               /*  {xtype: 'gridcolumn',dataIndex: 'address1',header: 'Address 1',sortable: true},
                 {xtype: 'gridcolumn',dataIndex: 'address2',header: 'Address 2',sortable: true},
                 {xtype: 'gridcolumn',dataIndex: 'address3',header: 'Address 3',sortable: true},
                 {xtype: 'gridcolumn',dataIndex: 'city',header: 'City',sortable: true},
                 {xtype: 'gridcolumn',dataIndex: 'zip',header: 'Zip',sortable: true}, */
-                {xtype: 'numbercolumn',dataIndex: 'givenSerialNumber',header: 'Serial #',sortable: true,
-                    editor: {
-                        xtype: 'numberfield',
-                        allowBlank: false,
-                        minValue: 0,
-                        maxValue: 150000
-                    }
-                }
             ],
             listeners:{
                 'viewready':function(grid){
@@ -164,6 +197,7 @@ CustomerListGrid = Ext.extend(Ext.grid.GridPanel, {
         }
         PageBus.subscribe("CustomerListGrid.CreateCustomerForm.Added",this,customerAdded,'createAddCustomerView');
         PageBus.subscribe("CustomerListGrid.CustomerList.modified",this,customerAdded,'createAddCustomerView');
+        getSectorStore();
         CustomerListGrid.superclass.initComponent.call(this);
     }
 });
@@ -171,7 +205,16 @@ CustomerListGrid = Ext.extend(Ext.grid.GridPanel, {
 function createAddCustomerView(){
     Ext.QuickTips.init();
     Ext.form.Field.prototype.msgTarget = 'side';
-
+    formSectorCombo = new Ext.form.ComboBox({
+        // all of your config options
+        store: sectorStore,
+        emptyText: 'Select Sector',
+        id: 'sector',
+        name: 'sector',
+        fieldLabel: 'Sector',
+        forceSelection: false,
+        typeAhead: true
+    });
     var customerWindow = new Ext.Window({
         title: "Add customer",
         layout:'fit',
@@ -223,7 +266,7 @@ CreateCustomerForm = Ext.extend(Ext.form.FormPanel, {
                         {xtype: 'textfield',id: 'name',name: 'name',allowBlank: false,fieldLabel: 'Name'},
                         {xtype: 'textfield',id: 'phone',name: 'phone',allowBlank: false,fieldLabel: 'Phone'},
                         {xtype: 'textfield',id: 'email',name: 'email',allowBlank: false,fieldLabel: 'eMail'},
-                        {xtype: 'textfield',id: 'sector',name: 'sector',allowBlank: false,fieldLabel: 'Sector'}
+                        formSectorCombo
                     ]
                 },
                 {
@@ -254,17 +297,20 @@ CreateCustomerForm = Ext.extend(Ext.form.FormPanel, {
                 text:'OK',
                 formBind: true,
                 handler:function(){
+                    customerListGridMask = new Ext.LoadMask(Ext.getCmp('createCustomerForm'), {msg:"Please wait..."})
+                    customerListGridMask.show();
                     var formValues = Ext.getCmp('createCustomerForm').getForm().getValues();
                     var jsonValues = Ext.encode(formValues);
                     Ext.Ajax.request({
                         url: '/rest/user/',
                         headers:{'Content-Type':'application/json; charset=utf-8'},
                         success: function(response, opts){
+                            customerListGridMask.hide();
                             PageBus.publish("CustomerListGrid.CreateCustomerForm.Added","Customer added");
                             PageBus.publish("CustomerListGrid.CreateCustomerForm.Cancel","My Message");
-                            //alert("Success");
                         },
                         failure: function(response, opts){
+                            customerListGridMask.hide();
                             console.log('server-side failure with status code ' + response.status);
                         },
                         params: jsonValues

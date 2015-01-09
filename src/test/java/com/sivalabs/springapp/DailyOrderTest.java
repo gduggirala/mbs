@@ -60,6 +60,7 @@ public class DailyOrderTest {
         user.setDailyBmOrder((double) 1);
         user.setBmPrice((double) 55);
         user.setCmPrice(45d);
+        user.setGivenSerialNumber(1 );
         User savedUser = userService.create(user);
         assertNotNull("User just got saved there should be ID associated", user.getId());
         User newUser = userService.findUserById(savedUser.getId());

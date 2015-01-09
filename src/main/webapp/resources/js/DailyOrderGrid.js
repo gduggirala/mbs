@@ -75,6 +75,11 @@ DailyOrdersGrid = Ext.extend(Ext.grid.GridPanel, {
     view: groupingView,
     initComponent: function () {
         Ext.applyIf(this, {
+            tbar: [{
+                text: 'Rerun DailyOrders',
+                iconCls: 'silk-table-refresh',
+                handler: onRerun
+            },'-'],
             columns: [
                 new Ext.grid.RowNumberer(),
                 {
@@ -109,6 +114,23 @@ DailyOrdersGrid = Ext.extend(Ext.grid.GridPanel, {
                 }
             ]
         });
+        function onRerun(){
+            var jsonValues={userId:selectedUserId};
+            var urll = './rest/dailyOrders/rerun?userId='+selectedUserId
+            Ext.Ajax.request({
+                url: urll,
+                method: 'POST',
+                headers: {'Content-Type': 'application/json; charset=utf-8'},
+                success: function (response, opts) {
+                    PageBus.publish("DailyOrderGrid.DailyOrder.modified", response.responseText);
+                },
+                failure: function (response, opts) {
+                    console.log('server-side failure with status code ' + response.status);
+                },
+                params: jsonValues
+            });
+        }
+
         function processSelectedCustomer(topic, messageFromPublisher, subscriberData) {
             dailyOrderStore.proxy.conn.url = './rest/dailyOrders/search?userId=' + messageFromPublisher.id;
             selectedUserId = messageFromPublisher.id;

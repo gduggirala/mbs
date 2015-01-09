@@ -54,7 +54,7 @@ public class User {
     private Integer givenSerialNumber;
 
     @Temporal(TemporalType.DATE)
-    @Column(nullable = true)
+    @Column(nullable = false)
     private Date orderStartDate;
 
     @OneToMany(mappedBy = "user", targetEntity = Role.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
