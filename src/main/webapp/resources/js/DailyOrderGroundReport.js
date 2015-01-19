@@ -67,11 +67,15 @@ DailyOrderGroundReportGrid = Ext.extend(Ext.grid.GridPanel, {
     },
     initComponent: function () {
         Ext.applyIf(this, {
-            tbar: [{
-                text: 'Download',
+            tbar: ['->',{
+                text: 'PDF',
                 iconCls: 'silk-pdf',
                 handler: downloadPdf
-            },'-'],
+            },'-',{
+                text: 'Excel',
+                iconCls: 'silk-page-excel',
+                handler: downloadExcel
+            }],
             columns: [
                 new Ext.grid.RowNumberer(),
                 {
@@ -99,16 +103,9 @@ DailyOrderGroundReportGrid = Ext.extend(Ext.grid.GridPanel, {
         });
         function downloadPdf(){
             window.open('/generate/dailyOrder.pdf');
-           /* Ext.Ajax.request({
-                url: '/generate/dailyOrder.pdf',
-                method: 'GET',
-                headers: {'Content-Type': 'application/json; charset=utf-8'},
-                success: function (response, opts) {
-                },
-                failure: function (response, opts) {
-                    console.log('server-side failure with status code ' + response.status);
-                }
-            });*/
+        }
+        function downloadExcel(){
+            window.open('/generate/dailyOrder.xls');
         }
         PageBus.subscribe("DailyOrderGrid.DailyOrder.modified", this, dailyOrderGroundReport, 'DailyOrderGroundReport');
         DailyOrderGroundReportGrid.superclass.initComponent.call(this);

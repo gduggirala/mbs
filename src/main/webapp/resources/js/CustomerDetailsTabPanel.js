@@ -44,6 +44,7 @@ CustomerDetailsTabPanel = Ext.extend(Ext.TabPanel, {
             '<p>BM Price:{bmPrice}</p>' +
             '<p>CM Price:{cmPrice}</p>' +
             '<p>Sector:{sector}</p>' +
+            '<p>Referred by:{referredBy}</p>' +
             '<p>Is Active:{active}</p>');
 
         function processSelectedCustomer(topic, messageFromPublisher, subscriberData) {

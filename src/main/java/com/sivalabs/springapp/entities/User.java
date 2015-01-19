@@ -52,6 +52,8 @@ public class User {
     private Boolean isActive;
     @Column
     private Integer givenSerialNumber;
+    @Column
+    private String referredBy;
 
     @Temporal(TemporalType.DATE)
     @Column(nullable = false)
@@ -235,5 +237,37 @@ public class User {
 
     public void setGivenSerialNumber(Integer givenSerialNumber) {
         this.givenSerialNumber = givenSerialNumber;
+    }
+
+    public String getReferredBy() {
+        return referredBy;
+    }
+
+    public void setReferredBy(String referredBy) {
+        this.referredBy = referredBy;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", sector='" + sector + '\'' +
+                ", phone='" + phone + '\'' +
+                ", address1='" + address1 + '\'' +
+                ", address2='" + address2 + '\'' +
+                ", address3='" + address3 + '\'' +
+                ", city='" + city + '\'' +
+                ", zip='" + zip + '\'' +
+                ", dailyCmOrder=" + dailyCmOrder +
+                ", dailyBmOrder=" + dailyBmOrder +
+                ", cmPrice=" + cmPrice +
+                ", bmPrice=" + bmPrice +
+                ", isActive=" + isActive +
+                ", givenSerialNumber=" + givenSerialNumber +
+                ", orderStartDate=" + orderStartDate +
+                '}';
     }
 }

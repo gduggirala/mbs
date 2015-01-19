@@ -16,6 +16,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -123,7 +124,7 @@ public class DailyOrderTest {
     @Test
     @Transactional
     @Rollback(true)
-    public void testCreateDailyOrdersForAllActiveUsers() {
+    public void testCreateDailyOrdersForAllActiveUsers() throws ParseException {
         dailyOrderService.createDailyOrdersForAllActiveUsers();
         List<DailyOrder> dailyOrders = dailyOrderService.findAllDailyOrders();
         Assert.notEmpty(dailyOrders);
@@ -152,7 +153,7 @@ public class DailyOrderTest {
     @Test
     @Transactional
     @Rollback(true)
-    public void testFinalizeDailyOrderForUser() {
+    public void testFinalizeDailyOrderForUser() throws ParseException {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DAY_OF_MONTH, -3);
         user.setOrderStartDate(calendar.getTime());

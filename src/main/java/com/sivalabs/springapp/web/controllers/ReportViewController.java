@@ -23,14 +23,14 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Controller
-public class PdfController {
+public class ReportViewController {
 
     @Autowired
     DailyOrderService dailyOrderService;
     @Autowired
     ReportsGenerator reportsGenerator;
 
-    @RequestMapping(value = "/generate/dailyOrder", method = RequestMethod.GET)
+    @RequestMapping(value = "/generate/dailyOrder.pdf", method = RequestMethod.GET)
     ModelAndView generatePdf(HttpServletRequest request,
                              HttpServletResponse response) throws Exception {
 
@@ -41,4 +41,17 @@ public class PdfController {
         modelAndView.addObject("formattedDateForReport",formattedDateForReport);
         return modelAndView;
     }
+
+    @RequestMapping(value = "/generate/dailyOrder.xls", method = RequestMethod.GET)
+    ModelAndView generateExcel(HttpServletRequest request,
+                             HttpServletResponse response) throws Exception {
+        Date dateOfConsideration = new Date();
+        String formattedDateForReport= DateUtils.getFormattedDateForReport(dateOfConsideration);
+        List<DailyOrderGround> dailyOrderGroundList = reportsGenerator.generateDailyOrderGroundReport(dateOfConsideration);
+        ModelAndView modelAndView = new ModelAndView("xlsView", "dailyOrderGroundList", dailyOrderGroundList);
+        modelAndView.addObject("formattedDateForReport",formattedDateForReport);
+        return modelAndView;
+
+    }
+
 }

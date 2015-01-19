@@ -36,13 +36,14 @@ dailyOrderStore = new Ext.data.JsonStore({
                 url: '/rest/dailyOrders/',
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json; charset=utf-8'},
+                params: jsonValues,
                 success: function (response, opts) {
                     PageBus.publish("DailyOrderGrid.DailyOrder.modified", record.data);
                 },
                 failure: function (response, opts) {
-                    console.log('server-side failure with status code ' + response.status);
-                },
-                params: jsonValues
+                    console.log('Server-side failure with status code ' + response.status);
+                    console.dir(response);
+                }
             });
         }
     }

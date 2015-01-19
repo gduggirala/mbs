@@ -1,4 +1,3 @@
-var customerListGridMask = {};
 sectorStore = {};
 var formSectorCombo = {};
 function getSectorStore(){
@@ -28,7 +27,8 @@ customerListStore = new Ext.data.JsonStore({
         {name: 'phone',type: 'string'},{name: 'address1',type: 'string'},{name: 'address2',type: 'string'},
         {name: 'address3',type: 'string'},{name: 'city',type: 'string'},{name: 'zip',type: 'string'},
         {name: 'dailyCmOrder',type: 'float'},{name: 'dailyBmOrder',type: 'float'},
-        {name: 'cmPrice',type: 'float'},{name: 'bmPrice',type: 'float'},{name: 'active',type: 'boolean'},{name: 'givenSerialNumber',type: 'int'}
+        {name: 'cmPrice',type: 'float'},{name: 'bmPrice',type: 'float'},{name: 'active',type: 'boolean'},{name: 'givenSerialNumber',type: 'int'},
+        {name: 'referredBy',type: 'string'}
     ],
     listeners:{
         load:function(store, records,options){
@@ -39,18 +39,14 @@ customerListStore = new Ext.data.JsonStore({
         update: function (store, record, operation) {
             var values = record.data;
             var jsonValues = Ext.encode(values);
-            var customerListGridMaskUpdate = new Ext.LoadMask(Ext.getCmp('customerListGridId').getEl(), {msg:"Please wait..."})
-            customerListGridMaskUpdate.show();
             Ext.Ajax.request({
                 url: '/rest/user/',
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json; charset=utf-8'},
                 success: function (response, opts) {
-                    customerListGridMaskUpdate.hide();
                     PageBus.publish("CustomerListGrid.CustomerList.modified", record.data);
                 },
                 failure: function (response, opts) {
-                    customerListGridMaskUpdate.hide();
                     console.log('server-side failure with status code ' + response.status);
                 },
                 params: jsonValues
@@ -65,7 +61,8 @@ var reader = new Ext.data.ArrayReader({}, [
     {name: 'address3',type: 'string'},{name: 'city',type: 'string'},{name: 'zip',type: 'string'},
     {name: 'dailyCmOrder',type: 'float'},{name: 'dailyBmOrder',type: 'float'},
     {name:'orderStartDate',type:'date',format:'Y-m-d'},
-    {name: 'cmPrice',type: 'float'},{name: 'bmPrice',type: 'float'},{name: 'active',type: 'boolean'},{name: 'givenSerialNumber',type: 'int'}
+    {name: 'cmPrice',type: 'float'},{name: 'bmPrice',type: 'float'},{name: 'active',type: 'boolean'},{name: 'givenSerialNumber',type: 'int'},
+    {name: 'referredBy',type: 'string'}
 ]);
 
 var groupingView = new Ext.grid.GroupingView({
@@ -74,7 +71,8 @@ var groupingView = new Ext.grid.GroupingView({
 });
 
 var editor = new Ext.ux.grid.RowEditor({
-    saveText: 'Update'
+    saveText: 'Update',
+
 });
 
 customerListGroupStore = new Ext.data.GroupingStore({
@@ -172,6 +170,9 @@ CustomerListGrid = Ext.extend(Ext.grid.GridPanel, {
                         minValue: '2012-12-01',
                         minText: 'Can\'t have a start date before the company existed!'
                     }
+                },
+                {xtype: 'gridcolumn',dataIndex: 'referredBy',header: 'Referred by',sortable: true,
+                    editor: {xtype: 'textfield',allowBlank: true}
                 }
               /*  {xtype: 'gridcolumn',dataIndex: 'address1',header: 'Address 1',sortable: true},
                 {xtype: 'gridcolumn',dataIndex: 'address2',header: 'Address 2',sortable: true},
@@ -289,7 +290,8 @@ CreateCustomerForm = Ext.extend(Ext.form.FormPanel, {
                         {xtype: 'textfield',id: 'address3',name: 'address3',fieldLabel: 'Address 3'},
                         {xtype: 'textfield',id: 'city',name: 'city',fieldLabel: 'City'},
                         {xtype: 'numberfield',id: 'zip',name: 'zip',fieldLabel: 'Zip'},
-                        {xtype: 'numberfield',id: 'givenSerialNumber',name: 'givenSerialNumber',fieldLabel: 'Serial #'}
+                        {xtype: 'numberfield',id: 'givenSerialNumber',name: 'givenSerialNumber',fieldLabel: 'Serial #'},
+                        {xtype: 'textfield',id: 'referredBy',name: 'referredBy',fieldLabel: 'Reference'}
                     ]
                 }
             ],
@@ -297,20 +299,16 @@ CreateCustomerForm = Ext.extend(Ext.form.FormPanel, {
                 text:'OK',
                 formBind: true,
                 handler:function(){
-                    customerListGridMask = new Ext.LoadMask(Ext.getCmp('createCustomerForm'), {msg:"Please wait..."})
-                    customerListGridMask.show();
                     var formValues = Ext.getCmp('createCustomerForm').getForm().getValues();
                     var jsonValues = Ext.encode(formValues);
                     Ext.Ajax.request({
                         url: '/rest/user/',
                         headers:{'Content-Type':'application/json; charset=utf-8'},
                         success: function(response, opts){
-                            customerListGridMask.hide();
                             PageBus.publish("CustomerListGrid.CreateCustomerForm.Added","Customer added");
                             PageBus.publish("CustomerListGrid.CreateCustomerForm.Cancel","My Message");
                         },
                         failure: function(response, opts){
-                            customerListGridMask.hide();
                             console.log('server-side failure with status code ' + response.status);
                         },
                         params: jsonValues
@@ -327,26 +325,3 @@ CreateCustomerForm = Ext.extend(Ext.form.FormPanel, {
         CreateCustomerForm.superclass.initComponent.call(this);
     }
 });
-
-/*EditCustomerForm = Ext.extend(Ext.form.FormPanel,{
-    autoScroll: true,
-    width: 590,
-    height:550,
-    frame: true,
-    id:'createCustomerForm',
-    monitorValid:true,
-    bodyStyle:'padding:5px 5px 0',
-    buttonAlign:'center',
-    initComponent: function() {
-        this.initialConfig = Ext.apply({
-            url: '/rest/user/'
-        }, this.initialConfig);
-    Ext.applyIf(this, {
-        items:[
-
-        ]
-    })
-
-})*/
-
-
