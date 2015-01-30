@@ -29,6 +29,21 @@ public class DailyOrderService {
     @Autowired
     private DailyOrderRepository dailyOrderRepository;
 
+    public void recalculateDailyOrderForUsers(List<User> userList){
+        for(User user:userList){
+            recalcuateDailyOrderForUser(user);
+        }
+    }
+
+    public void recalcuateDailyOrderForUser(User user){
+        Date orderStartDate = user.getOrderStartDate();
+        try {
+            createDailyOrderForUser(user, orderStartDate);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public DailyOrder findById(Long id) {
         return dailyOrderRepository.findById(id);
     }
@@ -97,6 +112,29 @@ public class DailyOrderService {
     @Transactional(propagation = Propagation.REQUIRED)
     public void createDailyOrderForUser(User user) throws ParseException {
         LocalDate localDate = LocalDate.now();
+        int noOfDays = localDate.lengthOfMonth();
+        if (user.getDailyBmOrder() != null && user.getDailyCmOrder() != null) {
+            for (int i = 1; i <= noOfDays; i++) {
+                //First check if there is any order existing for the day
+                LocalDate dateOfMonth = LocalDate.of(localDate.getYear(), localDate.getMonth(), i);
+                Date orderDate = DateUtils.asDate(dateOfMonth);
+
+                DailyOrder dailyOrder = dailyOrderRepository.findByUserIdAndOrderDate(user.getId(), orderDate);
+                if (dailyOrder == null && (DateUtils.getParsedAppFormattedDate(user.getOrderStartDate()).compareTo(DateUtils.getParsedAppFormattedDate(orderDate)) <= 0)) {
+                    dailyOrder = new DailyOrder();
+                    dailyOrder.setUser(user);
+                    dailyOrder.setCmOrder(user.getDailyCmOrder());
+                    dailyOrder.setBmOrder(user.getDailyBmOrder());
+                    dailyOrder.setOrderDate(orderDate);
+                    dailyOrderRepository.save(dailyOrder);
+                }
+            }
+        }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void createDailyOrderForUser(User user, Date fromDate) throws ParseException {
+        LocalDate localDate = DateUtils.asLocalDate(fromDate);
         int noOfDays = localDate.lengthOfMonth();
         if (user.getDailyBmOrder() != null && user.getDailyCmOrder() != null) {
             for (int i = 1; i <= noOfDays; i++) {

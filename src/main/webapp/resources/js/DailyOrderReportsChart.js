@@ -3,11 +3,10 @@ DailyOrderReportsChart = Ext.extend(Ext.Panel, {
     layoutConfig:{
         align:'middle'
     },
-    id: 'dailyOrderReportsChartId',
+    id: 'dailyOrderReportsChartMasterId',
     frame: true,
     title: 'Daily Orders Report',
     flex: 1,
-    html: 'Loading...',
     collapsible:true,
     listeners: {
         render: function (thisPanel) {
@@ -17,7 +16,25 @@ DailyOrderReportsChart = Ext.extend(Ext.Panel, {
     initComponent: function () {
         Ext.applyIf(this, {
             items: [
-
+                {
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    items: [
+                        {
+                            xtype: 'panel',
+                            flex:1,
+                            html: '<img src="./rest/charts/dailyOrderReportChart"/>'
+                        },
+                        {
+                            xtype: 'panel',
+                            flex:1,
+                            html: '<img src="./rest/charts/dailyOrderRevenueTrend"/>'
+                        }
+                    ]
+                },
+                {
+                    id: 'dailyOrderReportsChartId'
+                }
             ]
         });
         function dailyOrderChanged(topic, messageFromPublisher, subscriberData) {
@@ -31,7 +48,7 @@ DailyOrderReportsChart = Ext.extend(Ext.Panel, {
 
 function dailyOrderReporter() {
     Ext.Ajax.request({
-        url: '/rest/report/dailyOrderReport',
+        url: './rest/report/dailyOrderReport',
         method: 'GET',
         headers: {'Content-Type': 'application/json; charset=utf-8'},
         success: function (response, opts) {

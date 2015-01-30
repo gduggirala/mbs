@@ -2,7 +2,7 @@ sectorStore = {};
 var formSectorCombo = {};
 function getSectorStore(){
     Ext.Ajax.request({
-        url: '/rest/user/sectors',
+        url: './rest/user/sectors',
         method: 'GET',
         headers: {'Content-Type': 'application/json; charset=utf-8'},
         success: function (response, opts) {
@@ -40,7 +40,7 @@ customerListStore = new Ext.data.JsonStore({
             var values = record.data;
             var jsonValues = Ext.encode(values);
             Ext.Ajax.request({
-                url: '/rest/user/',
+                url: './rest/user/',
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json; charset=utf-8'},
                 success: function (response, opts) {
@@ -246,11 +246,11 @@ CreateCustomerForm = Ext.extend(Ext.form.FormPanel, {
     monitorValid:true,
     bodyStyle:'padding:5px 5px 0',
     //title: 'Customer Information',
-    url: '/rest/user/',
+    url: './rest/user/',
     buttonAlign:'center',
     initComponent: function() {
         this.initialConfig = Ext.apply({
-            url: '/rest/user/'
+            url: './rest/user/'
         }, this.initialConfig);
 
         Ext.applyIf(this, {
@@ -302,7 +302,7 @@ CreateCustomerForm = Ext.extend(Ext.form.FormPanel, {
                     var formValues = Ext.getCmp('createCustomerForm').getForm().getValues();
                     var jsonValues = Ext.encode(formValues);
                     Ext.Ajax.request({
-                        url: '/rest/user/',
+                        url: './rest/user/',
                         headers:{'Content-Type':'application/json; charset=utf-8'},
                         success: function(response, opts){
                             PageBus.publish("CustomerListGrid.CreateCustomerForm.Added","Customer added");

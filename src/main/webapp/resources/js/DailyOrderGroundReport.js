@@ -102,10 +102,10 @@ DailyOrderGroundReportGrid = Ext.extend(Ext.grid.GridPanel, {
             ]
         });
         function downloadPdf(){
-            window.open('/generate/dailyOrder.pdf');
+            window.open('./generate/dailyOrder.pdf');
         }
         function downloadExcel(){
-            window.open('/generate/dailyOrder.xls');
+            window.open('./generate/dailyOrder.xls');
         }
         PageBus.subscribe("DailyOrderGrid.DailyOrder.modified", this, dailyOrderGroundReport, 'DailyOrderGroundReport');
         DailyOrderGroundReportGrid.superclass.initComponent.call(this);

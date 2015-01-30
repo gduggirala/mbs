@@ -1,7 +1,8 @@
 package com.sivalabs.springapp.reports.pojo;
 
+import java.util.Date;
+
 /**
- * Created with IntelliJ IDEA.
  * User: gduggirala
  * Date: 4/1/15
  * Time: 12:32 PM
@@ -12,6 +13,8 @@ public class DailyOrderReport {
     private Double bmRevenue;
     private Double cmRevenue;
     private String sector;
+    private Date orderDate;
+    private String orderMonth;
 
     public Double getTotalCmOrder() {
         return totalCmOrder;
@@ -51,5 +54,21 @@ public class DailyOrderReport {
 
     public void setCmRevenue(Double cmRevenue) {
         this.cmRevenue = cmRevenue;
+    }
+
+    public Date getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(Date orderDate) {
+        this.orderDate = orderDate;
+    }
+
+    public String getOrderMonth() {
+        return orderMonth;
+    }
+
+    public void setOrderMonth(String orderMonth) {
+        this.orderMonth = orderMonth;
     }
 }

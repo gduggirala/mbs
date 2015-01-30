@@ -31,7 +31,7 @@ PaidToUnpaidReport = Ext.extend(Ext.Panel, {
 
 function paidToUnpaidBillReport() {
     Ext.Ajax.request({
-        url: '/rest/report/monthlyBills',
+        url: './rest/report/monthlyBills',
         method: 'GET',
         headers: {'Content-Type': 'application/json; charset=utf-8'},
         success: function (response, opts) {

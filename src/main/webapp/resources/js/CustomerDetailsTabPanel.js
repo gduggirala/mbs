@@ -68,7 +68,7 @@ CustomerDetailsTabPanel = Ext.extend(Ext.TabPanel, {
         }
 
         function activateOrDeactivateUser() {
-            var url = '/rest/user/status/' + Ext.getCmp('customerDetailsTabPanelId').selectedCustomerRecord.id;
+            var url = './rest/user/status/' + Ext.getCmp('customerDetailsTabPanelId').selectedCustomerRecord.id;
             Ext.Ajax.request({
                 url: url,
                 method: 'POST',

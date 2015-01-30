@@ -60,7 +60,7 @@ public class ReportsResource {
 
     @RequestMapping(value="/monthlyBills", method= RequestMethod.GET, produces= MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getratePaidToUnpaidBills() throws SQLException {
+    public ResponseEntity<Map<String, Object>> generatePaidToUnpaidBills() throws SQLException {
         LocalDate localDate = LocalDate.now();
         List<Bill> billList = billService.findByMonth(localDate.minusMonths(1).getMonth(), localDate.minusMonths(1).getYear());
         List<Bill> paidBills = Lambda.filter(having(on(Bill.class).getPaidAmount(),greaterThan(0d)),billList);

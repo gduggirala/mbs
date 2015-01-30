@@ -29,7 +29,7 @@ customerBillListStore = new Ext.data.JsonStore({
     restful: true,
     autoLoad: false,
     storeId: 'billStoreId',
-    url: '/rest/bill/',
+    url: './rest/bill/',
     root: 'bills',
     fields: [
         {name: 'id', type: 'int'},
@@ -65,7 +65,7 @@ customerBillListStore = new Ext.data.JsonStore({
             var values = record.data;
             var jsonValues = Ext.encode(values);
             Ext.Ajax.request({
-                url: '/rest/bill/',
+                url: './rest/bill/',
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json; charset=utf-8'},
                 success: function (response, opts) {
@@ -178,7 +178,7 @@ CustomerBillGrid = Ext.extend(Ext.grid.GridPanel, {
             ]
         });
         function processSelectedCustomer(topic, messageFromPublisher, subscriberData) {
-            customerBillListStore.proxy.conn.url = '/rest/bill/user/' + messageFromPublisher.id;
+            customerBillListStore.proxy.conn.url = './rest/bill/user/' + messageFromPublisher.id;
             selectedUserId = messageFromPublisher.id;
             customerBillListStore.load();
             Ext.getCmp('customerBillGridId').setTitle(messageFromPublisher.data.name + "'s bill");

@@ -32,10 +32,10 @@ public class ReportsGenerator {
 
     public List<DailyOrderReport> generateDailyOrderReport(String formattedDate) throws SQLException {
 
-        String sql = "SELECT sum(d0.bmOrder) AS 'totalBmOrder', (sum(d0.bmOrder) * u.bmPrice) as 'bmRevenue',  sum(d0.cmOrder) AS 'totalCmOrder', (sum(d0.cmOrder) * u.cmPrice) as 'cmRevenue', u.sector AS 'sector'\n" +
-                " FROM daily_order d0\n" +
-                " INNER JOIN users u ON d0.user_Id=u.id\n" +
-                " WHERE orderDate = ? and u.isActive=true\n" +
+        String sql = "SELECT sum(d0.bmOrder) AS 'totalBmOrder', (sum(d0.bmOrder) * u.bmPrice) as 'bmRevenue',  sum(d0.cmOrder) AS 'totalCmOrder', (sum(d0.cmOrder) * u.cmPrice) as 'cmRevenue', u.sector AS 'sector' " +
+                " FROM daily_order d0 " +
+                " INNER JOIN users u ON d0.user_Id=u.id " +
+                " WHERE orderDate = ? and u.isActive=true " +
                 " GROUP BY u.sector";
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         List<DailyOrderReport> dailyOrderReportList = jdbcTemplate.query(sql, new Object[]{formattedDate}, new BeanPropertyRowMapper(DailyOrderReport.class));
@@ -46,6 +46,17 @@ public class ReportsGenerator {
         return generateDailyOrderGroundReport(DateUtils.getAppFormattedDate(date));
     }
 
+    public List<DailyOrderReport> generateRevenueTrend(){
+        String sql = "SELECT (SUM(d0.bmOrder) * u.bmPrice) AS 'bmRevenue', (SUM(d0.cmOrder) * u.cmPrice) AS 'cmRevenue',  " +
+                " DATE_FORMAT(d0.orderDate, '%M') AS 'orderMonth' " +
+                "FROM daily_order d0 " +
+                "INNER JOIN users u ON d0.user_Id=u.id " +
+                "WHERE u.isActive= TRUE " +
+                "GROUP BY YEAR(d0.orderDate), MONTH(d0.orderDate)";
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        List<DailyOrderReport> dailyOrderReportList = jdbcTemplate.query(sql, new BeanPropertyRowMapper(DailyOrderReport.class));
+        return dailyOrderReportList;
+    }
     public List<DailyOrderGround> generateDailyOrderGroundReport(String formattedDate) throws SQLException{
         String sql ="SELECT d0.bmOrder AS 'bmOrder', d0.cmOrder AS 'cmOrder', u.sector AS 'sector', u.name AS 'name', u.phone AS 'phone', d0.orderDate AS 'orderDate', u.givenSerialNumber AS 'givenSerialNumber', u.address1 as 'address1' " +
                 "FROM daily_order d0 " +

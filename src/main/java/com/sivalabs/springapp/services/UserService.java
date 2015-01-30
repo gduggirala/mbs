@@ -30,6 +30,9 @@ public class UserService
 
     @Autowired
     private BillService billService;
+
+    @Autowired
+    private DailyOrderService dailyOrderService;
 	/*
 	@Autowired
 	public UserService(UserDao userDao) {
@@ -48,7 +51,9 @@ public class UserService
 
 	public User create(User user) {
 		//return userDao.create(user);
-		return userRepository.save(user);
+        userRepository.save(user);
+        dailyOrderService.recalcuateDailyOrderForUser(user);
+		return user;
 	}
 
     public List<User> create(List<User> users) {

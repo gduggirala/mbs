@@ -33,7 +33,7 @@ dailyOrderStore = new Ext.data.JsonStore({
             var values = record.data;
             var jsonValues = Ext.encode(values);
             Ext.Ajax.request({
-                url: '/rest/dailyOrders/',
+                url: './rest/dailyOrders/',
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json; charset=utf-8'},
                 params: jsonValues,
