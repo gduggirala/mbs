@@ -11,8 +11,8 @@ CustomerDetailsTabPanel = Ext.extend(Ext.TabPanel, {
                     title: 'Info',
                     frame: true,
                     tbar: [
-                        {xtype: 'button', text: 'Edit', iconCls: 'silk-user-edit', handler: editUser},
-                        '-',
+                        /*{xtype: 'button', text: 'Edit', iconCls: 'silk-user-edit', handler: editUser},
+                        '-',*/
                         {xtype: 'button', text: 'Activate/Inactivate', id: 'activateOrInactivateId', handler: activateOrDeactivateUser},
                         '-'
                     ]
