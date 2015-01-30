@@ -1,5 +1,6 @@
 package com.sivalabs.springapp.services;
 
+import ch.lambdaj.Lambda;
 import com.sivalabs.springapp.entities.Bill;
 import com.sivalabs.springapp.entities.DailyOrder;
 import com.sivalabs.springapp.entities.User;
@@ -14,10 +15,9 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+
+import static ch.lambdaj.Lambda.on;
 
 /**
  * User: giridhad
@@ -95,6 +95,15 @@ public class BillService {
         return usersBill;
     }
 
+    public Bill recalculateUserBillByUser(Long userId) {
+        User user = userService.findUserById(userId);
+        Set<Bill> billSet = user.getBills();
+        //Sorted in ascending order.
+        List<Bill> sortedBills = Lambda.sort(billSet, on(Bill.class).getId());
+        Bill latestBill = sortedBills.get(sortedBills.size()-1);
+        return recalculateUserBill(latestBill);
+    }
+
     public Bill recalculateUserBill(Long billId) {
         Bill bill = billRepository.findOne(billId);
         return recalculateUserBill(bill);
@@ -111,16 +120,20 @@ public class BillService {
         }
         List<DailyOrder> dailyOrders = dailyOrderService.findByUserIdAndOrderDateBetween(user.getId(), dateNotBefore, dateNotAfter);
         double totalCmLiters = 0, totalBmLiters = 0;
-        for (DailyOrder dailyOrder : dailyOrders) {
+        /*for (DailyOrder dailyOrder : dailyOrders) {
             totalBmLiters = totalBmLiters + dailyOrder.getBmOrder();
             totalCmLiters = totalCmLiters + dailyOrder.getCmOrder();
+        }*/
+        for(int i=0;i<dailyOrders.size();i++){
+            totalBmLiters = totalBmLiters + dailyOrders.get(i).getBmOrder();
+            totalCmLiters = totalCmLiters + dailyOrders.get(i).getCmOrder();
         }
         double totalCmCost = totalCmLiters * cmPrice;
         double totalBmCost = totalBmLiters * bmPrice;
         double billTotal = totalBmCost + totalCmCost;
         double previousMonthsBalance = bill.getPreviousMonthsBalanceAmount();
 
-        double grandTotal = (billTotal + previousMonthsBalance + bill.getOtherCharges()) - bill.getDiscount();
+        double grandTotal = (billTotal + previousMonthsBalance + (bill.getOtherCharges()==null?0.0:bill.getOtherCharges())) - (bill.getDiscount()==null?0.0:bill.getDiscount());
 
         bill.setGenerationDate(Calendar.getInstance().getTime());
         bill.setTotalAmount(grandTotal);
@@ -130,7 +143,7 @@ public class BillService {
         bill.setTotalCmPrice(totalCmCost);
         bill.setBmPerQuantityPrice(user.getBmPrice());
         bill.setCmPerQuantityPrice(user.getCmPrice());
-        if(bill.getPaidAmount() != null){
+        if (bill.getPaidAmount() != null) {
             bill.setBalanceAmount(bill.getTotalAmount() - bill.getPaidAmount());
         }
         billRepository.save(bill);
@@ -243,6 +256,6 @@ public class BillService {
     }
 
     public void finalizeBillForUser(User user, Date lastDateOfService) {
-        dailyOrderService.finalizeDailyOrderForUser(user,lastDateOfService);
+        dailyOrderService.finalizeDailyOrderForUser(user, lastDateOfService);
     }
 }

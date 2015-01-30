@@ -121,6 +121,13 @@ CustomerBillGrid = Ext.extend(Ext.grid.GridPanel, {
     plugins: [billGridRowExpander, editor],
     initComponent: function () {
         Ext.applyIf(this, {
+            tbar:[
+                {
+                    text:'Calculate current month bill',
+                    iconCls:'silk-calculator',
+                    handler:calculateCurrentMonthBill
+                }
+            ],
             columns: [
                 billGridRowExpander,
                 {xtype: 'datecolumn', dataIndex: 'fromDate', header: 'From Date', sortable: true, format: 'Y-m-d'},
@@ -190,7 +197,21 @@ CustomerBillGrid = Ext.extend(Ext.grid.GridPanel, {
             customerBillListStore.load();
         }
 
+        function calculateCurrentMonthBill(){
+            var urll = './rest/bill/generate/user/' + selectedUserId;
+            Ext.Ajax.request({
+                url: urll,
+                headers:{'Content-Type':'application/json; charset=utf-8'},
+                success: function(response, opts){
+                    PageBus.publish("CustomerBillGrid.Bill.modified","Bill Generated");
+                },
+                failure: function(response, opts){
+                    console.log('server-side failure with status code ' + response.status);
+                }
+            });
+        }
         PageBus.subscribe("CustomerListGrid.customer.selected", this, processSelectedCustomer, 'BillGrid');
+        PageBus.subscribe("DailyOrderGrid.DailyOrder.modified", this,processBillChanged,'BillGrid');
         PageBus.subscribe("CustomerBillGrid.Bill.modified", this, processBillChanged, 'BillGrid');
         CustomerBillGrid.superclass.initComponent.call(this);
     }
