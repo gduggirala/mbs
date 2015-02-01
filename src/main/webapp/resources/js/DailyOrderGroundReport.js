@@ -23,7 +23,7 @@ dailyOrderGroundReportStore = new Ext.data.JsonStore({
         {name: 'id'},
         {name: 'cmOrder'},
         {name: 'bmOrder'},
-        {name: 'orderDate', type: 'date', format: 'Y-m-d'},
+        {name: 'orderDate', type: 'date', dateFormat:'Y-m-d'},
         {name: 'name', type: 'string'},
         {name: 'sector', type: 'string'},
         {name: 'phone', type: 'string'},
@@ -36,8 +36,31 @@ dailyOrderGroundReportStore = new Ext.data.JsonStore({
             gridPanel.store.data = store.data;
             gridPanel.getView().refresh(true);
             gridPanel.setTitle("Today's Order");
+        },
+        update:function(store, record, operation){
+            var changedOrderDate = record.data.orderDate.format('Y-m-d');
+            record.data.orderDate = changedOrderDate;
+            var values = record.data;
+            var jsonValues = Ext.encode(values);
+            Ext.Ajax.request({
+                url: './rest/dailyOrders/update/',
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json; charset=utf-8'},
+                params: jsonValues,
+                success: function (response, opts) {
+                    PageBus.publish("DailyOrderGrid.DailyOrder.modified", record.data);
+                },
+                failure: function (response, opts) {
+                    console.log('Server-side failure with status code ' + response.status);
+                    console.dir(response);
+                }
+            });
         }
     }
+});
+
+var editor = new Ext.ux.grid.RowEditor({
+    saveText: 'Update'
 });
 
 dailyOrderGroundGroupStore = new Ext.data.GroupingStore({
@@ -58,6 +81,7 @@ DailyOrderGroundReportGrid = Ext.extend(Ext.grid.GridPanel, {
     id: 'dailyOrderGroundGridId',
     title: "Today's Daily Orders",
     frame:true,
+    plugins: [editor],
     store: dailyOrderGroundGroupStore,
     view: groupingView,
     listeners: {
@@ -91,10 +115,22 @@ DailyOrderGroundReportGrid = Ext.extend(Ext.grid.GridPanel, {
                     xtype: 'gridcolumn', dataIndex: 'phone', header: 'Phone', sortable: true, width: 100
                 },
                 {
-                    xtype: 'gridcolumn', dataIndex: 'cmOrder', header: 'CM Order', sortable: true, width: 100
+                    xtype: 'gridcolumn', dataIndex: 'cmOrder', header: 'CM Order', sortable: true, width: 100,
+                    editor: {
+                        xtype: 'numberfield',
+                        allowBlank: false,
+                        minValue: 0,
+                        maxValue: 150000
+                    }
                 },
                 {
-                    xtype: 'gridcolumn', dataIndex: 'bmOrder', header: 'BM Order', sortable: true, width: 100
+                    xtype: 'gridcolumn', dataIndex: 'bmOrder', header: 'BM Order', sortable: true, width: 100,
+                    editor: {
+                        xtype: 'numberfield',
+                        allowBlank: false,
+                        minValue: 0,
+                        maxValue: 150000
+                    }
                 },
                 {
                     xtype: 'gridcolumn', dataIndex: 'address1', header: 'Address1', sortable: true, width: 100

@@ -1,5 +1,8 @@
 package com.sivalabs.springapp.reports.pojo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.sivalabs.springapp.web.controllers.CustomDateSerializer;
+
 import java.util.Date;
 
 /**
@@ -9,6 +12,8 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 public class DailyOrderGround {
+    //DailyOrder id.
+    private Long id;
     private Double cmOrder;
     private Double bmOrder;
     private String name;
@@ -50,6 +55,7 @@ public class DailyOrderGround {
         this.sector = sector;
     }
 
+    @JsonSerialize(using = CustomDateSerializer.class, as=Date.class)
     public Date getOrderDate() {
         return orderDate;
     }
@@ -80,5 +86,13 @@ public class DailyOrderGround {
 
     public void setAddress1(String address1) {
         this.address1 = address1;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

@@ -1,16 +1,19 @@
 package com.sivalabs.springapp.reports.service;
 
 import com.sivalabs.springapp.DateUtils;
+import com.sivalabs.springapp.reports.pojo.BillListReport;
 import com.sivalabs.springapp.reports.pojo.DailyOrderGround;
 import com.sivalabs.springapp.reports.pojo.DailyOrderReport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -57,13 +60,28 @@ public class ReportsGenerator {
         List<DailyOrderReport> dailyOrderReportList = jdbcTemplate.query(sql, new BeanPropertyRowMapper(DailyOrderReport.class));
         return dailyOrderReportList;
     }
+
     public List<DailyOrderGround> generateDailyOrderGroundReport(String formattedDate) throws SQLException{
-        String sql ="SELECT d0.bmOrder AS 'bmOrder', d0.cmOrder AS 'cmOrder', u.sector AS 'sector', u.name AS 'name', u.phone AS 'phone', d0.orderDate AS 'orderDate', u.givenSerialNumber AS 'givenSerialNumber', u.address1 as 'address1' " +
+        String sql ="SELECT d0.id as 'id', d0.bmOrder AS 'bmOrder', d0.cmOrder AS 'cmOrder', u.sector AS 'sector', u.name AS 'name', u.phone AS 'phone', d0.orderDate AS 'orderDate', u.givenSerialNumber AS 'givenSerialNumber', u.address1 as 'address1' " +
                 "FROM daily_order d0 " +
                 "INNER JOIN users u ON d0.user_Id=u.id " +
                 "WHERE orderDate = ? AND u.isActive= TRUE";
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         List<DailyOrderGround> dailyOrderGroundList = jdbcTemplate.query(sql, new Object[]{formattedDate}, new BeanPropertyRowMapper(DailyOrderGround.class));
         return dailyOrderGroundList;
+    }
+
+    public List<BillListReport> generateBillReport(String previousMonth, String previousPreviousMonth) throws SQLException{
+        List<String> months = new ArrayList<>(2);
+        months.add(previousMonth);
+        months.add(previousPreviousMonth);
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("months", months);
+        String sql =String.format("SELECT b0.*, DATE_FORMAT(b0.toDate, '%%M') AS 'month', u.name, u.sector, u.address1, u.givenSerialNumber, u.phone, u.dailybmOrder, u.dailyCmOrder " +
+                "FROM bill b0 " +
+                "INNER JOIN users u ON b0.USER_ID = u.id where DATE_FORMAT(b0.toDate, '%%M') in ('%s', '%s')",previousMonth, previousPreviousMonth);
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        List<BillListReport> billListReports = jdbcTemplate.query(sql, new BeanPropertyRowMapper(BillListReport.class));
+        return billListReports;
     }
 }

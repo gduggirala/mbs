@@ -3,6 +3,7 @@ package com.sivalabs.springapp.web.controllers;
 import ch.lambdaj.Lambda;
 import com.sivalabs.springapp.DateUtils;
 import com.sivalabs.springapp.entities.Bill;
+import com.sivalabs.springapp.reports.pojo.BillListReport;
 import com.sivalabs.springapp.reports.pojo.DailyOrderGround;
 import com.sivalabs.springapp.reports.pojo.DailyOrderReport;
 import com.sivalabs.springapp.reports.service.ReportsGenerator;
@@ -96,6 +97,20 @@ public class ReportsResource {
         userMap.put("success",Boolean.TRUE);
         userMap.put("total",dailyOrderGroundList.size());
         userMap.put("dailyOrderGrounds",dailyOrderGroundList);
+        return new ResponseEntity<Map<String, Object>>(userMap, HttpStatus.OK);
+    }
+
+    @RequestMapping(value="/listBills", method= RequestMethod.GET, produces= MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> listBills() throws SQLException {
+        LocalDate localDate = LocalDate.now();
+        LocalDate previousMonth = localDate.minusMonths(1);
+        LocalDate previousPreviousMonth = localDate.minusMonths(2);
+        List<BillListReport> billListReports = reportsGenerator.generateBillReport(previousMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.US), previousPreviousMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.US));
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("success",Boolean.TRUE);
+        userMap.put("total",billListReports.size());
+        userMap.put("billListReports",billListReports);
         return new ResponseEntity<Map<String, Object>>(userMap, HttpStatus.OK);
     }
 

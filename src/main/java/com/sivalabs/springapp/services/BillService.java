@@ -8,6 +8,7 @@ import com.sivalabs.springapp.repositories.BillRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
@@ -150,6 +151,7 @@ public class BillService {
         return bill;
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Bill generateUserBill(User user, Month month, int year) {
         Calendar calendar = Calendar.getInstance();
         final double cmPrice = user.getCmPrice();
@@ -205,6 +207,12 @@ public class BillService {
         bill.setBmPerQuantityPrice(user.getBmPrice());
         bill.setCmPerQuantityPrice(user.getCmPrice());
         bill.setPreviousMonthsBalanceAmount(previousMonthsBalance);
+        bill.setPaidAmount(Double.valueOf(0));
+        bill.setOtherCharges(Double.valueOf(0));
+        bill.setDiscount(Double.valueOf(0));
+        if (bill.getPaidAmount() != null) {
+            bill.setBalanceAmount(bill.getTotalAmount() - bill.getPaidAmount());
+        }
         bill.setComment((previousMonthsBalance < 0 || previousMonthsBalance > 0) ? "Other Charges: Previous Month balance " + previousMonthsBalance : "Other Charges: None");
         billRepository.save(bill);
         return bill;

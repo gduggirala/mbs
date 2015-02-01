@@ -25,8 +25,8 @@ MasterViewUi = Ext.extend(Ext.Viewport, {
                             items: [
                                 new DailyOrderGroundReportGrid(),
                                 new DailyOrderReportsChart(),
-                                new PaidToUnpaidReport()
-
+                                new PaidToUnpaidReport(),
+                                new BillsList()
                             ]
                         },
                         {

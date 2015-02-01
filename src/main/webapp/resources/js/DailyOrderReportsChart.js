@@ -14,6 +14,9 @@ DailyOrderReportsChart = Ext.extend(Ext.Panel, {
         }
     },
     initComponent: function () {
+        screenWidth = (Ext.getBody().getSize().width-50)/2;
+        dailyOrderReportChartUrl = '<img src="./rest/charts/dailyOrderReportChart?width='+screenWidth+'"/>';
+        dailyOrderRevenueTrendUrl = '<img src="./rest/charts/dailyOrderRevenueTrend?width='+screenWidth+'"/>';
         Ext.applyIf(this, {
             items: [
                 {
@@ -22,15 +25,25 @@ DailyOrderReportsChart = Ext.extend(Ext.Panel, {
                     items: [
                         {
                             xtype: 'panel',
+                            autoScroll:true,
                             flex:1,
-                            html: '<img src="./rest/charts/dailyOrderReportChart"/>'
+                            html: dailyOrderReportChartUrl
                         },
                         {
                             xtype: 'panel',
+                            autoScroll:true,
                             flex:1,
-                            html: '<img src="./rest/charts/dailyOrderRevenueTrend"/>'
+                            html:dailyOrderRevenueTrendUrl
+                        }/*,
+                        {
+                            xtype:'panel',
+                            autoLoad:{
+                                url:'./rest/google/charts/googleCharts',
+                                scripts:true
+                            }
+
                         }
-                    ]
+*/                    ]
                 },
                 {
                     id: 'dailyOrderReportsChartId'

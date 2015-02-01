@@ -58,7 +58,7 @@ public class ChartsResource {
         List<DailyOrderReport> dailyOrderReportList = reportsGenerator.generateDailyOrderReport(new Date());
         Map<String, Object> userMap = new HashMap<>();
         int height = 500;
-        int width = 700;
+        int width = new Integer(request.getParameter("width"));
         JFreeChart barChart = ChartFactory.createBarChart3D(
                 "Daily order for " + formattedDate,
                 "Sector",
@@ -80,7 +80,7 @@ public class ChartsResource {
         List<DailyOrderReport> dailyOrderReportList = reportsGenerator.generateRevenueTrend();
         Map<String, Object> userMap = new HashMap<>();
         int height = 500;
-        int width = 700;
+        int width = new Integer(request.getParameter("width"));;
         JFreeChart barChart = ChartFactory.createBarChart3D(
                 "Revenue Trend ",
                 "Month",

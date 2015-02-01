@@ -1,5 +1,3 @@
-var selectedUserId = null;
-
 var reader = new Ext.data.ArrayReader({}, [
     {name: 'id', type: 'int'},
     {dateformat: 'Y-m-d', name: 'fromDate', type: 'date'},
@@ -22,15 +20,22 @@ var reader = new Ext.data.ArrayReader({}, [
     {name: 'month', type: 'string'},
     {name: 'previousMonthsBalanceAmount', type: 'float'},
     {name: 'billableAmount', type: 'float'},
-    {name: 'payableAmount', type: 'float'}
+    {name: 'payableAmount', type: 'float'},
+    {name: 'name', type: 'string'},
+    {name: 'sector', type: 'string'},
+    {name: 'address1', type: 'string'},
+    {name: 'givenSerialNumber', type: 'integer'},
+    {name: 'phone', type: 'string'},
+    {name: 'dailyBmOrder', type: 'float'},
+    {name: 'dailyCmOrder', type: 'float'}
 ]);
 
-customerBillListStore = new Ext.data.JsonStore({
+billsListStore = new Ext.data.JsonStore({
     restful: true,
     autoLoad: false,
     storeId: 'billStoreId',
-    url: './rest/bill/',
-    root: 'bills',
+    url: './rest/report/listBills',
+    root: 'billListReports',
     fields: [
         {name: 'id', type: 'int'},
         {format: 'Y-m-d', name: 'fromDate', type: 'date'},
@@ -53,13 +58,21 @@ customerBillListStore = new Ext.data.JsonStore({
         {name: 'month', type: 'string'},
         {name: 'previousMonthsBalanceAmount', type: 'float'},
         {name: 'billableAmount', type: 'float'},
-        {name: 'payableAmount', type: 'float'}
+        {name: 'payableAmount', type: 'float'},
+        {name: 'name', type: 'string'},
+        {name: 'sector', type: 'string'},
+        {name: 'address1', type: 'string'},
+        {name: 'givenSerialNumber', type: 'integer'},
+        {name: 'phone', type: 'string'},
+        {name: 'dailyBmOrder', type: 'float'},
+        {name: 'dailyCmOrder', type: 'float'}
     ],
     listeners: {
         load: function (store, records, options) {
-            var gridPanel = Ext.getCmp('customerBillGridId');
+            var gridPanel = Ext.getCmp('billsListGridId');
             gridPanel.store.data = store.data;
             gridPanel.getView().refresh(true);
+            gridPanel.setTitle("Bills")
         },
         update: function (store, record, operation) {
             var values = record.data;
@@ -79,10 +92,9 @@ customerBillListStore = new Ext.data.JsonStore({
         }
     }
 });
-
 billGroupStore = new Ext.data.GroupingStore({
     reader: reader,
-    data: customerBillListStore.data,
+    data: billsListStore.data,
     sortInfo: {field: 'month', direction: "ASC"},
     groupField: 'month'
 });
@@ -91,13 +103,13 @@ var editor = new Ext.ux.grid.RowEditor({
     saveText: 'Update'
 });
 
-billGridRowExpander = new Ext.ux.grid.RowExpander({
+billListGridRowExpander = new Ext.ux.grid.RowExpander({
     tpl: new Ext.XTemplate(
         '<br/><p><b>Start Date:</b>&nbsp;&nbsp;{fromDate:date("d M  Y")}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>End Date:</b>&nbsp;&nbsp;{toDate:date("d M  Y")}',
         '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Generated on:</b>&nbsp;&nbsp;{generationDate:date("d M Y")}</p> <br/>',
         '<table padding="15px;" border="1px solid black;"><tr><th><b>Charge type</b></th><th><b>Total Milk delivered</b></th><th><b>Price/Liter</b></th><th><b>Total amount</b></th></tr>',
-        '<tr><td><b>CM</b></td><td>{totalCmQty}</td><td>{cmPerQuantityPrice}</td><td><b>{totalCmPrice}</b></td></tr>',
         '<tr><td><b>BM</b></td><td>{totalBmQty}</td><td>{bmPerQuantityPrice}</td><td><b>{totalBmPrice}</b></td></tr>',
+        '<tr><td><b>CM</b></td><td>{totalCmQty}</td><td>{cmPerQuantityPrice}</td><td><b>{totalCmPrice}</b></td></tr>',
         '<tr><td><b>Others</b></td><td></td><td></td><td>{otherCharges}</td></tr>',
         '<tr><td></td><td></td><td><b>Billable Amount</b></td><td><b>{billableAmount}</b></td></tr></table>',
         '<br />',
@@ -108,113 +120,120 @@ billGridRowExpander = new Ext.ux.grid.RowExpander({
     )
 });
 
-CustomerBillGrid = Ext.extend(Ext.grid.GridPanel, {
+function billsListStoreLoader(){
+    billsListStore.load();
+}
+BillsList = Ext.extend(Ext.grid.GridPanel, {
     height: 471,
     width: 785,
     autoScroll: true,
     forceFit: true,
-    id: 'customerBillGridId',
-    store: customerBillListStore,
+    frame:true,
+    id: 'billsListGridId',
+    store: billsListStore,
     viewConfig: {
         forceFit: true
     },
-    plugins: [billGridRowExpander, editor],
+    plugins: [billListGridRowExpander],
+    listeners: {
+        render: function (thisPanel) {
+            billsListStoreLoader();
+        }
+    },
     initComponent: function () {
         Ext.applyIf(this, {
             tbar:[
+                'Generate bills for the month:',
                 {
-                    text:'Calculate current month bill',
-                    iconCls:'silk-calculator',
-                    handler:calculateCurrentMonthBill
+                    xtype     : 'combo',
+                    typeAhead: true,
+                    triggerAction: 'all',
+                    lazyRender:true,
+                    width     : 100,
+                    mode: 'local',
+                    store     : new  Ext.data.ArrayStore({
+                        id:'monthsStore',
+                        fields: [
+                            'monthId',
+                            'displayText'
+                        ],
+                        data: [ [1, 'January'], [2, 'February'], [3, 'March'], [4, 'April'], [5, 'May'],
+                                [6, 'June'], [7, 'July'], [8, 'August'], [9, 'September'],
+                                [10, 'October'], [11, 'November'], [12, 'December']]
+                    }),
+                    listeners:{
+                        'select':calculateCurrentMonthBill
+                    },
+                    valueField: 'monthId',
+                    displayField: 'displayText'
                 }
             ],
             columns: [
-                billGridRowExpander,
-/*
-                {xtype: 'datecolumn', dataIndex: 'fromDate', header: 'From Date', sortable: true, format: 'Y-m-d'},
-                {xtype: 'datecolumn', dataIndex: 'toDate', header: 'To Date', sortable: true, format: 'Y-m-d'},
-                {xtype: 'datecolumn', dataIndex: 'generationDate', header: 'Generated on', sortable: true, format: 'Y-m-d'},
-*/
+                new Ext.grid.RowNumberer(),
+                billListGridRowExpander,
+                /*
+                 {xtype: 'datecolumn', dataIndex: 'fromDate', header: 'From Date', sortable: true, format: 'Y-m-d'},
+                 {xtype: 'datecolumn', dataIndex: 'toDate', header: 'To Date', sortable: true, format: 'Y-m-d'},
+                 {xtype: 'datecolumn', dataIndex: 'generationDate', header: 'Generated on', sortable: true, format: 'Y-m-d'},
+                 */
                 {xtype: 'numbercolumn', dataIndex: 'totalCmQty', header: 'Tot. CM Qty', sortable: true},
                 {xtype: 'numbercolumn', dataIndex: 'totalBmQty', header: 'Tot. BM Qty', sortable: true},
                 {xtype: 'numbercolumn', dataIndex: 'totalCmPrice', header: 'Tot. CM Price', sortable: true},
                 {xtype: 'numbercolumn', dataIndex: 'totalBmPrice', header: 'Tot. BM Price', sortable: true},
-                {xtype: 'numbercolumn', dataIndex: 'discount', header: 'Discount', sortable: true,
-                    editor: {
-                        xtype: 'numberfield',
-                        allowBlank: false,
-                        minValue: 0,
-                        maxValue: 150000
-                    }
+                {xtype: 'numbercolumn', dataIndex: 'discount', header: 'Discount', sortable: true
                 },
-                {xtype: 'numbercolumn', dataIndex: 'otherCharges', header: 'Other Charges', sortable: true,
-                    editor: {
-                        xtype: 'numberfield',
-                        allowBlank: false,
-                        minValue: 0,
-                        maxValue: 150000
-                    }
+                {xtype: 'numbercolumn', dataIndex: 'otherCharges', header: 'Other Charges', sortable: true
                 },
                 {xtype: 'numbercolumn', dataIndex: 'billableAmount', header: 'Billable Amt.', sortable: true},
-                {xtype: 'numbercolumn', dataIndex: 'paidAmount', header: 'Paid Amt.', sortable: true,
-                    editor: {
-                        xtype: 'numberfield',
-                        allowBlank: false,
-                        minValue: 0,
-                        maxValue: 150000
-                    }
+                {xtype: 'numbercolumn', dataIndex: 'paidAmount', header: 'Paid Amt.', sortable: true
                 },
                 {xtype: 'numbercolumn', dataIndex: 'balanceAmount', header: 'Balance Amt.', sortable: true},
-                {xtype: 'numbercolumn', dataIndex: 'bmPerQuantityPrice', header: 'BM Per Qty. Price', sortable: true,
-                    editor: {
-                        xtype: 'numberfield',
-                        allowBlank: false,
-                        minValue: 0,
-                        maxValue: 150000
-                    }
+                {xtype: 'numbercolumn', dataIndex: 'bmPerQuantityPrice', header: 'BM Per Qty. Price', sortable: true
                 },
-                {xtype: 'numbercolumn', dataIndex: 'cmPerQuantityPrice', header: 'CM Per Qty. Price', sortable: true,
-                    editor: {
-                        xtype: 'numberfield',
-                        allowBlank: false,
-                        minValue: 0,
-                        maxValue: 150000
-                    }
+                {xtype: 'numbercolumn', dataIndex: 'cmPerQuantityPrice', header: 'CM Per Qty. Price', sortable: true
                 },
                 /*{xtype: 'checkcolumn', dataIndex: 'closed', header: 'Paid?', sortable: true
-                },*/
-                {xtype: 'gridcolumn', dataIndex: 'month', header: 'Month', sortable: true}
+                 },*/
+                {xtype: 'gridcolumn', dataIndex: 'month', header: 'Month', sortable: true},
+                {xtype: 'gridcolumn', dataIndex:  'name', header: 'Name', sortable: true},
+                {xtype: 'gridcolumn', dataIndex: 'sector', header: 'Sector', sortable: true},
+                {xtype: 'gridcolumn', dataIndex: 'address1', header: 'Address1', sortable: true},
+                {xtype: 'gridcolumn', dataIndex: 'givenSerialNumber', header: 'Serail #', sortable: true},
+                {xtype: 'gridcolumn', dataIndex: 'phone', header: 'Phone', sortable: true},
+                {xtype: 'gridcolumn', dataIndex: 'dailyBmOrder', header: 'Daily BM Order', sortable: true},
+                {xtype: 'gridcolumn', dataIndex: 'dailyCmOrder', header: 'Daily CM Order', sortable: true}
+
             ]
         });
-        function processSelectedCustomer(topic, messageFromPublisher, subscriberData) {
-            customerBillListStore.proxy.conn.url = './rest/bill/user/' + messageFromPublisher.id;
-            selectedUserId = messageFromPublisher.id;
-            customerBillListStore.load();
-            Ext.getCmp('customerBillGridId').setTitle(messageFromPublisher.data.name + "'s bill");
-
-        }
 
         function processBillChanged(topic, messageFromPublisher, subscriberData) {
-            customerBillListStore.proxy.conn.url = './rest/bill/user/' + selectedUserId;
-            customerBillListStore.load();
+          //  billsListStore.proxy.conn.url = './rest/bill/user/' + selectedUserId;
+            billsListStore.load();
         }
 
-        function calculateCurrentMonthBill(){
-            var urll = './rest/bill/generate/user/' + selectedUserId;
+        function calculateCurrentMonthBill(combo, record, index ){
+            var myMask = new Ext.LoadMask(Ext.get('billsListGridId'), {msg:"Generating bills...", removeMask:true});
+            Ext.Msg.alert('Caution', 'You are generating the bills for all the customers for '+record.data.displayText+' month as back ground job is failed \n as it will take more time so please be patient');
+            var urll = './rest/bill/generateAll?monthValue='+record.data.monthId+'&monthText='+record.data.displayText;
+            myMask.show();
             Ext.Ajax.request({
                 url: urll,
+                method:'POST',
+                timeout:1800000,
                 headers:{'Content-Type':'application/json; charset=utf-8'},
                 success: function(response, opts){
-                    PageBus.publish("CustomerBillGrid.Bill.modified","Bill Generated");
+                    myMask.hide()
+                    PageBus.publish("BillsList.Bill.modified","Bill Generated");
                 },
                 failure: function(response, opts){
+                    myMask.hide()
                     console.log('server-side failure with status code ' + response.status);
                 }
             });
         }
-        PageBus.subscribe("CustomerListGrid.customer.selected", this, processSelectedCustomer, 'BillGrid');
+
         PageBus.subscribe("DailyOrderGrid.DailyOrder.modified", this,processBillChanged,'BillGrid');
-        PageBus.subscribe("CustomerBillGrid.Bill.modified", this, processBillChanged, 'BillGrid');
-        CustomerBillGrid.superclass.initComponent.call(this);
+        PageBus.subscribe("BillsList.Bill.modified", this, processBillChanged, 'BillGrid');
+        BillsList.superclass.initComponent.call(this);
     }
 });

@@ -3,6 +3,7 @@ package com.sivalabs.springapp.web.controllers;
 import com.sivalabs.springapp.entities.Bill;
 import com.sivalabs.springapp.entities.DailyOrder;
 import com.sivalabs.springapp.entities.User;
+import com.sivalabs.springapp.reports.pojo.DailyOrderGround;
 import com.sivalabs.springapp.services.BillService;
 import com.sivalabs.springapp.services.DailyOrderService;
 import com.sivalabs.springapp.services.UserService;
@@ -62,6 +63,16 @@ public class DailyOrderResource {
         Map<String, List<DailyOrder>> dailyOrderMap = new HashMap<>();
         dailyOrderMap.put("dailyOrders", dailyOrders);
         return new ResponseEntity<>(dailyOrderMap, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/update", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public DailyOrder updateDailyOrder(@RequestBody DailyOrderGround dailyOrderGround) throws ParseException {
+        DailyOrder dailyOrder = dailyOrderService.findById(dailyOrderGround.getId());
+        dailyOrder.setBmOrder(dailyOrderGround.getBmOrder());
+        dailyOrder.setCmOrder(dailyOrderGround.getCmOrder());
+        dailyOrderService.update(dailyOrder);
+        return dailyOrder;
     }
 
     @RequestMapping(value = "/", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)

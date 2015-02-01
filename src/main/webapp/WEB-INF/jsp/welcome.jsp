@@ -12,6 +12,9 @@
     <script type="text/javascript" src="${rootURL}resources/ext/ext-all-debug-w-comments.js"></script>
     <script type="text/javascript" src="${rootURL}resources/ext/ux/ux-all-debug.js"></script>
 
+    <%-- <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
+    <script type="text/javascript" src="${rootURL}resources/ext/ux/GoogleVisualizationComponent.js"></script>--%>
     <script type="text/javascript" src="${rootURL}resources/js/pageBus.js"></script>
 
     <script type="text/javascript" src="${rootURL}resources/js/CustomerListGrid.js"></script>
@@ -20,8 +23,10 @@
     <script type="text/javascript" src="${rootURL}resources/js/DailyOrderGrid.js"></script>
     <script type="text/javascript" src="${rootURL}resources/js/BillGrid.js"></script>
     <script type="text/javascript" src="${rootURL}resources/js/DailyOrderReportsChart.js"></script>
+    <script type="text/javascript" src="${rootURL}resources/js/BillsList.js"></script>
     <script type="text/javascript" src="${rootURL}resources/js/PaidToUnpaidReport.js"></script>
     <script type="text/javascript" src="${rootURL}resources/js/app.js"></script>
+
 
     <script type="text/javascript">
         Ext.onReady(function () {

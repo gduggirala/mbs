@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -85,5 +86,17 @@ public class BillResource {
         modifiedBill.setUser(actualBill.getUser());
         Bill bill = billService.update(modifiedBill);
         return new ResponseEntity<Bill>(bill, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/generateAll", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public  ResponseEntity<Map<String, List<Bill>>> generateAllCustomerBills(@RequestParam("monthValue") Integer monthValue,
+    @RequestParam("monthText") String month) {
+        LocalDate now = LocalDate.now();
+        Month month1 = Month.of(monthValue);
+        List<Bill> billsList = billService.generateCustomerBills(month1, now.getYear());
+        Map<String, List<Bill>> billMap= new HashMap<>();
+        billMap.put("bills",billsList);
+        return new ResponseEntity<>(billMap, HttpStatus.OK) ;
     }
 }
