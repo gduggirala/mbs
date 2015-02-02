@@ -24,7 +24,7 @@
     </properties>
 
     <build>
-        <finalName>cmb-${project.version}</finalName>
+        <finalName>cmb</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
