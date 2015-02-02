@@ -35,11 +35,10 @@ dailyOrderGroundReportStore = new Ext.data.JsonStore({
             var gridPanel = Ext.getCmp('dailyOrderGroundGridId');
             gridPanel.store.data = store.data;
             gridPanel.getView().refresh(true);
-            gridPanel.setTitle("Today's Order");
+            gridPanel.setTitle("Today's Order ( "+Ext.util.Format.date(records[0].data.orderDate,'Y-m-d')+" )");
         },
         update:function(store, record, operation){
-            var changedOrderDate = record.data.orderDate.format('Y-m-d');
-            record.data.orderDate = changedOrderDate;
+            record.data.orderDate = record.data.orderDate.format('Y-m-d');
             var values = record.data;
             var jsonValues = Ext.encode(values);
             Ext.Ajax.request({
@@ -91,7 +90,30 @@ DailyOrderGroundReportGrid = Ext.extend(Ext.grid.GridPanel, {
     },
     initComponent: function () {
         Ext.applyIf(this, {
-            tbar: ['->',{
+            tbar: ['Generate Daily orders for the month:',
+                {
+                    xtype     : 'combo',
+                    typeAhead: true,
+                    triggerAction: 'all',
+                    lazyRender:true,
+                    width     : 100,
+                    mode: 'local',
+                    store     : new  Ext.data.ArrayStore({
+                        id:'monthsStore',
+                        fields: [
+                            'monthId',
+                            'displayText'
+                        ],
+                        data: [ [1, 'January'], [2, 'February'], [3, 'March'], [4, 'April'], [5, 'May'],
+                            [6, 'June'], [7, 'July'], [8, 'August'], [9, 'September'],
+                            [10, 'October'], [11, 'November'], [12, 'December']]
+                    }),
+                    listeners:{
+                        'select':calculateDailyOrdersForMonth
+                    },
+                    valueField: 'monthId',
+                    displayField: 'displayText'
+                },'->',{
                 text: 'PDF',
                 iconCls: 'silk-pdf',
                 handler: downloadPdf
@@ -142,6 +164,26 @@ DailyOrderGroundReportGrid = Ext.extend(Ext.grid.GridPanel, {
         }
         function downloadExcel(){
             window.open('./generate/dailyOrder.xls');
+        }
+        function calculateDailyOrdersForMonth(combo, record, index){
+            var myMask = new Ext.LoadMask(Ext.get('dailyOrderGroundGridId'), {msg:"Generating daily orders...", removeMask:true});
+            //Ext.Msg.alert('Caution', 'You are generating the bills for all the customers for '+record.data.displayText+' month as back ground job is failed \n as it will take more time so please be patient');
+            var urll = './rest/dailyOrders/generateAll?monthValue='+record.data.monthId+'&monthText='+record.data.displayText;
+            myMask.show();
+            Ext.Ajax.request({
+                url: urll,
+                method:'POST',
+                timeout:1800000,
+                headers:{'Content-Type':'application/json; charset=utf-8'},
+                success: function(response, opts){
+                    myMask.hide()
+                    PageBus.publish("DailyOrderGrid.DailyOrder.modified", "DailyOrdersGroundReport");
+                },
+                failure: function(response, opts){
+                    myMask.hide()
+                    console.log('server-side failure with status code ' + response.status);
+                }
+            });
         }
         PageBus.subscribe("DailyOrderGrid.DailyOrder.modified", this, dailyOrderGroundReport, 'DailyOrderGroundReport');
         DailyOrderGroundReportGrid.superclass.initComponent.call(this);

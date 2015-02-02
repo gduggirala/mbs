@@ -1,14 +1,39 @@
+var reader = new Ext.data.ArrayReader({}, [
+    {name: 'id', type: 'int'},
+    {dateformat: 'Y-m-d', name: 'fromDate', type: 'date'},
+    {dateformat: 'Y-m-d', name: 'toDate', type: 'date'},
+    {dateformat: 'Y-m-d', name: 'generationDate', type: 'date'},
+    {name: 'totalCmQty', type: 'float'},
+    {name: 'totalBmQty', type: 'float'},
+    {name: 'totalCmPrice', type: 'float'},
+    {name: 'totalBmPrice', type: 'float'},
+    {name: 'discount', type: 'float'},
+    {name: 'otherCharges', type: 'float'},
+    {name: 'totalAmount', type: 'float'},
+    {name: 'discountReason', type: 'string'},
+    {name: 'paidAmount', type: 'float'},
+    {name: 'balanceAmount', type: 'float'},
+    {name: 'bmPerQuantityPrice', type: 'float'},
+    {name: 'cmPerQuantityPrice', type: 'float'},
+    {name: 'comment', type: 'string'},
+    {name: 'closed', type: 'boolean'},
+    {name: 'month', type: 'string'},
+    {name: 'previousMonthsBalanceAmount', type: 'float'},
+    {name: 'billableAmount', type: 'float'},
+    {name: 'payableAmount', type: 'float'}
+]);
+
+
 PaidToUnpaidReport = Ext.extend(Ext.Panel, {
     autoScroll: true,
     layoutConfig:{
         align:'middle'
     },
-    id: 'paidToUnpaidReportId',
+    id: 'paidToUnpaidReportMaster',
     frame: true,
     title: 'Paid to Unpaid Reports',
     flex: 1,
     collapsible:true,
-    html: 'Loading...',
     listeners: {
         render: function (thisPanel) {
             paidToUnpaidBillReport();
@@ -18,6 +43,9 @@ PaidToUnpaidReport = Ext.extend(Ext.Panel, {
         Ext.applyIf(this, {
             items: [
 
+                {
+                    id:'paidToUnpaidReportId'
+                }
             ]
         });
         function billChanged(topic, messageFromPublisher, subscriberData) {

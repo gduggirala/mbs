@@ -137,6 +137,7 @@ BillsList = Ext.extend(Ext.grid.GridPanel, {
     plugins: [billListGridRowExpander],
     listeners: {
         render: function (thisPanel) {
+            var billsListMask = new Ext.LoadMask(Ext.get('billsListGridId'), {msg:"Please wait...", store:billsListStore});
             billsListStoreLoader();
         }
     },
@@ -166,6 +167,12 @@ BillsList = Ext.extend(Ext.grid.GridPanel, {
                     },
                     valueField: 'monthId',
                     displayField: 'displayText'
+                },'->',{
+                    iconCls:'silk-table-refresh',
+                    text:'Refresh',
+                    handler:function(){
+                        billsListStore.load();
+                    }
                 }
             ],
             columns: [
@@ -211,7 +218,7 @@ BillsList = Ext.extend(Ext.grid.GridPanel, {
             billsListStore.load();
         }
 
-        function calculateCurrentMonthBill(combo, record, index ){
+        function calculateCurrentMonthBill(combo, record, index){
             var myMask = new Ext.LoadMask(Ext.get('billsListGridId'), {msg:"Generating bills...", removeMask:true});
             Ext.Msg.alert('Caution', 'You are generating the bills for all the customers for '+record.data.displayText+' month as back ground job is failed \n as it will take more time so please be patient');
             var urll = './rest/bill/generateAll?monthValue='+record.data.monthId+'&monthText='+record.data.displayText;

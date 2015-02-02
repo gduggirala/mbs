@@ -75,6 +75,15 @@ public class DailyOrderResource {
         return dailyOrder;
     }
 
+    @RequestMapping(value = "/generateAll", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public void generateDailyOrders(@RequestParam("monthValue") Integer monthValue,
+                                          @RequestParam("monthText") String month) throws ParseException {
+        LocalDate localDate = LocalDate.now();
+        LocalDate localDate1 = LocalDate.of(localDate.getYear(), monthValue, localDate.getDayOfMonth());
+        dailyOrderService.createDailyOrdersForAllActiveUsers(localDate1);
+    }
+
     @RequestMapping(value = "/", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<DailyOrder> updateUser(@RequestBody DailyOrder modifiedDailyOrder) {

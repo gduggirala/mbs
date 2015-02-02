@@ -65,7 +65,7 @@ public class ReportsResource {
         LocalDate localDate = LocalDate.now();
         List<Bill> billList = billService.findByMonth(localDate.minusMonths(1).getMonth(), localDate.minusMonths(1).getYear());
         List<Bill> paidBills = Lambda.filter(having(on(Bill.class).getPaidAmount(),greaterThan(0d)),billList);
-        List<Bill> unpaidBills = Lambda.filter(having(on(Bill.class).getPaidAmount(),lessThan(1)),billList);
+        List<Bill> unpaidBills = Lambda.filter(having(on(Bill.class).getPaidAmount(),lessThan(1d)),billList);
         Map<String, Object> userMap = new HashMap<>();
         Double unpaidAmount =(double) 0;
         Double paidAmount =(double) 0;

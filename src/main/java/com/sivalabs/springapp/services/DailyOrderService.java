@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
@@ -109,16 +110,22 @@ public class DailyOrderService {
         }
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void createDailyOrdersForAllActiveUsers(LocalDate localDate) throws ParseException {
+        List<User> users = userService.findByIsActiveTrue();
+        for (User user : users) {
+            createDailyOrderForUser(user, localDate);
+        }
+    }
+
     @Transactional(propagation = Propagation.REQUIRED)
-    public void createDailyOrderForUser(User user) throws ParseException {
-        LocalDate localDate = LocalDate.now();
+    public void createDailyOrderForUser(User user, LocalDate localDate) throws ParseException {
         int noOfDays = localDate.lengthOfMonth();
         if (user.getDailyBmOrder() != null && user.getDailyCmOrder() != null) {
             for (int i = 1; i <= noOfDays; i++) {
                 //First check if there is any order existing for the day
                 LocalDate dateOfMonth = LocalDate.of(localDate.getYear(), localDate.getMonth(), i);
                 Date orderDate = DateUtils.asDate(dateOfMonth);
-
                 DailyOrder dailyOrder = dailyOrderRepository.findByUserIdAndOrderDate(user.getId(), orderDate);
                 if (dailyOrder == null && (DateUtils.getParsedAppFormattedDate(user.getOrderStartDate()).compareTo(DateUtils.getParsedAppFormattedDate(orderDate)) <= 0)) {
                     dailyOrder = new DailyOrder();
@@ -130,6 +137,12 @@ public class DailyOrderService {
                 }
             }
         }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void createDailyOrderForUser(User user) throws ParseException {
+        LocalDate localDate = LocalDate.now();
+        createDailyOrderForUser(user, localDate);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
