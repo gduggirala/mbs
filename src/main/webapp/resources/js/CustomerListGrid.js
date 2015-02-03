@@ -1,4 +1,7 @@
 sectorStore = {};
+function  inMoney(val, p, record){
+    return Ext.util.Format.inMoney(val);
+}
 var formSectorCombo = {};
 function getSectorStore(){
     Ext.Ajax.request({
@@ -146,21 +149,21 @@ CustomerListGrid = Ext.extend(Ext.grid.GridPanel, {
                         maxValue: 150000
                     }
                 },
-                {xtype: 'numbercolumn',dataIndex: 'cmPrice',header: 'CM Price',sortable: true,
+                {dataIndex: 'cmPrice',header: 'CM Price',sortable: true,
                     editor: {
                         xtype: 'numberfield',
                         allowBlank: false,
                         minValue: 0,
                         maxValue: 150000
-                    }
+                    }, renderer:inMoney
                 },
-                {xtype: 'numbercolumn',dataIndex: 'bmPrice',header: 'BM Price',sortable: true,
+                {dataIndex: 'bmPrice',header: 'BM Price',sortable: true,
                     editor: {
                         xtype: 'numberfield',
                         allowBlank: false,
                         minValue: 0,
                         maxValue: 150000
-                    }
+                    }, renderer:inMoney
                 },
                 {
                     xtype: 'datecolumn', dataIndex: 'orderStartDate', header: 'Order Start Date', sortable: true, width: 100, format: 'Y-m-d',

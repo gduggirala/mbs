@@ -1,5 +1,7 @@
 var selectedUserId = null;
-
+function  inMoney(val, p, record){
+    return Ext.util.Format.inMoney(val);
+}
 var reader = new Ext.data.ArrayReader({}, [
     {name: 'id', type: 'int'},
     {dateformat: 'Y-m-d', name: 'fromDate', type: 'date'},
@@ -96,15 +98,15 @@ billGridRowExpander = new Ext.ux.grid.RowExpander({
         '<br/><p><b>Start Date:</b>&nbsp;&nbsp;{fromDate:date("d M  Y")}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>End Date:</b>&nbsp;&nbsp;{toDate:date("d M  Y")}',
         '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Generated on:</b>&nbsp;&nbsp;{generationDate:date("d M Y")}</p> <br/>',
         '<table padding="15px;" border="1px solid black;"><tr><th><b>Charge type</b></th><th><b>Total Milk delivered</b></th><th><b>Price/Liter</b></th><th><b>Total amount</b></th></tr>',
-        '<tr><td><b>CM</b></td><td>{totalCmQty}</td><td>{cmPerQuantityPrice}</td><td><b>{totalCmPrice}</b></td></tr>',
-        '<tr><td><b>BM</b></td><td>{totalBmQty}</td><td>{bmPerQuantityPrice}</td><td><b>{totalBmPrice}</b></td></tr>',
-        '<tr><td><b>Others</b></td><td></td><td></td><td>{otherCharges}</td></tr>',
-        '<tr><td></td><td></td><td><b>Billable Amount</b></td><td><b>{billableAmount}</b></td></tr></table>',
+        '<tr><td><b>CM</b></td><td>{totalCmQty}</td><td>{cmPerQuantityPrice:inMoney}</td><td><b>{totalCmPrice:inMoney}</b></td></tr>',
+        '<tr><td><b>BM</b></td><td>{totalBmQty}</td><td>{bmPerQuantityPrice:inMoney}</td><td><b>{totalBmPrice:inMoney}</b></td></tr>',
+        '<tr><td><b>Others</b></td><td></td><td></td><td>{otherCharges:inMoney}</td></tr>',
+        '<tr><td></td><td></td><td><b>Billable Amount</b></td><td><b>{billableAmount:inMoney}</b></td></tr></table>',
         '<br />',
-        '<p><b>Discount:</b>{discount}</p>',
-        '<p><b>Paid Amount:</b>{paidAmount}</p>',
-        '<p><b>Previous months balance:</b>{previousMonthsBalanceAmount}</p>',
-        '<p><b>Payable Amount:</b>{payableAmount}</p>'
+        '<p><b>Discount:</b>{discount:inMoney}</p>',
+        '<p><b>Paid Amount:</b>{paidAmount:inMoney}</p>',
+        '<p><b>Previous months balance:</b>{previousMonthsBalanceAmount:inMoney}</p>',
+        '<p><b>Payable Amount:</b>{payableAmount:inMoney}</p>'
     )
 });
 
@@ -137,49 +139,52 @@ CustomerBillGrid = Ext.extend(Ext.grid.GridPanel, {
 */
                 {xtype: 'numbercolumn', dataIndex: 'totalCmQty', header: 'Tot. CM Qty', sortable: true},
                 {xtype: 'numbercolumn', dataIndex: 'totalBmQty', header: 'Tot. BM Qty', sortable: true},
-                {xtype: 'numbercolumn', dataIndex: 'totalCmPrice', header: 'Tot. CM Price', sortable: true},
-                {xtype: 'numbercolumn', dataIndex: 'totalBmPrice', header: 'Tot. BM Price', sortable: true},
-                {xtype: 'numbercolumn', dataIndex: 'discount', header: 'Discount', sortable: true,
+                {dataIndex: 'totalCmPrice', header: 'Tot. CM Price', sortable: true,renderer: inMoney},
+                {dataIndex: 'totalBmPrice', header: 'Tot. BM Price', sortable: true,renderer: inMoney},
+                {dataIndex: 'discount', header: 'Discount', sortable: true,
                     editor: {
                         xtype: 'numberfield',
                         allowBlank: false,
                         minValue: 0,
                         maxValue: 150000
-                    }
+                    },renderer: inMoney
                 },
-                {xtype: 'numbercolumn', dataIndex: 'otherCharges', header: 'Other Charges', sortable: true,
+                {dataIndex: 'otherCharges', header: 'Other Charges', sortable: true,
                     editor: {
                         xtype: 'numberfield',
                         allowBlank: false,
                         minValue: 0,
                         maxValue: 150000
-                    }
+                    }, renderer: inMoney
                 },
-                {xtype: 'numbercolumn', dataIndex: 'billableAmount', header: 'Billable Amt.', sortable: true},
-                {xtype: 'numbercolumn', dataIndex: 'paidAmount', header: 'Paid Amt.', sortable: true,
-                    editor: {
-                        xtype: 'numberfield',
-                        allowBlank: false,
-                        minValue: 0,
-                        maxValue: 150000
-                    }
+                {
+                    dataIndex: 'billableAmount', header: 'Billable Amt.', sortable: true,
+                    renderer: inMoney
                 },
-                {xtype: 'numbercolumn', dataIndex: 'balanceAmount', header: 'Balance Amt.', sortable: true},
-                {xtype: 'numbercolumn', dataIndex: 'bmPerQuantityPrice', header: 'BM Per Qty. Price', sortable: true,
+                {dataIndex: 'paidAmount', header: 'Paid Amt.', sortable: true,
                     editor: {
                         xtype: 'numberfield',
                         allowBlank: false,
                         minValue: 0,
                         maxValue: 150000
-                    }
+                    }, renderer: inMoney
                 },
-                {xtype: 'numbercolumn', dataIndex: 'cmPerQuantityPrice', header: 'CM Per Qty. Price', sortable: true,
+                {dataIndex: 'balanceAmount', header: 'Balance Amt.', sortable: true, renderer: inMoney},
+                {dataIndex: 'bmPerQuantityPrice', header: 'BM Per Qty. Price', sortable: true,
                     editor: {
                         xtype: 'numberfield',
                         allowBlank: false,
                         minValue: 0,
                         maxValue: 150000
-                    }
+                    }, renderer: inMoney
+                },
+                {dataIndex: 'cmPerQuantityPrice', header: 'CM Per Qty. Price', sortable: true,
+                    editor: {
+                        xtype: 'numberfield',
+                        allowBlank: false,
+                        minValue: 0,
+                        maxValue: 150000
+                    },renderer: inMoney
                 },
                 /*{xtype: 'checkcolumn', dataIndex: 'closed', header: 'Paid?', sortable: true
                 },*/

@@ -69,10 +69,10 @@ function dailyOrderReporter() {
             var tpl = new Ext.XTemplate(
                 '<table border="1" style="width:100%"><tr bgcolor="#C8C8C8"><td><b>Sector</b></td><td><b>BM Order</b></td><td><b>BM Revenue</b></td><td><b>CM Order</b></td><td><b>CM Revenue</b></td></tr>',
                 '<tpl for="dailyOrderReport">',
-                '<tr><td bgcolor="#C8C8C8"><b>{sector}</b></td><td>{totalBmOrder}</td><td>{bmRevenue}</td><td>{totalCmOrder}</td><td>{cmRevenue}</td></tr>',
+                '<tr><td bgcolor="#C8C8C8"><b>{sector}</b></td><td>{totalBmOrder}</td><td>{bmRevenue:inMoney}</td><td>{totalCmOrder}</td><td>{cmRevenue:inMoney}</td></tr>',
                 '</tpl>',
-                '<tr bgcolor="#C8C8C8"><td><b>Total</b></td><td><b>{grandTotalBmOrder}</b></td><td><b>{totalBmRevenue}</b></td><td><b>{grandTotalCmOrder}</b></td><td><b>{totalCmRevenue}</b></td></tr>',
-                '<tr bgcolor="#C8C8C8"><td><b>Grand Total Revenue</b></td><td colspan="4"><b>{totalMilkRevenue}</b></td></tr>',
+                '<tr bgcolor="#C8C8C8"><td><b>Total</b></td><td><b>{grandTotalBmOrder}</b></td><td><b>{totalBmRevenue:inMoney}</b></td><td><b>{grandTotalCmOrder}</b></td><td><b>{totalCmRevenue:inMoney}</b></td></tr>',
+                '<tr bgcolor="#C8C8C8"><td><b>Grand Total Revenue</b></td><td colspan="4"><b>{totalMilkRevenue:inMoney}</b></td></tr>',
                 '</table> '
             );
             var panel = Ext.getCmp('dailyOrderReportsChartId');

@@ -27,9 +27,16 @@
     <script type="text/javascript" src="${rootURL}resources/js/PaidToUnpaidReport.js"></script>
     <script type="text/javascript" src="${rootURL}resources/js/app.js"></script>
 
+    <script type="text/javascript" src="${rootURL}resources/js/JsWorld.min.js"></script>
+    <script type="text/javascript" src="${rootURL}resources/js/hi_IN.js"></script>
+
 
     <script type="text/javascript">
         Ext.onReady(function () {
+            Ext.mf =  new jsworld.MonetaryFormatter(new jsworld.Locale(POSIX_LC.hi_IN));
+            Ext.util.Format.inMoney = function(val){
+                return Ext.mf.format(val);
+            }
             Ext.rootUrl = '${rootURL}';
             Ext.BLANK_IMAGE_URL = '${rootURL}resources/ext/resources/images/default/s.gif';
             //Ext.chart.Chart.CHART_URL = 'http://localhost:8080/resources/ext/resources/charts.swf'
