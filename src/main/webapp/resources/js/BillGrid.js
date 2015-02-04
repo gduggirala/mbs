@@ -95,18 +95,20 @@ var editor = new Ext.ux.grid.RowEditor({
 
 billGridRowExpander = new Ext.ux.grid.RowExpander({
     tpl: new Ext.XTemplate(
-        '<br/><p><b>Start Date:</b>&nbsp;&nbsp;{fromDate:date("d M  Y")}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>End Date:</b>&nbsp;&nbsp;{toDate:date("d M  Y")}',
+        '<br/><p class=ex1><b>Start Date:</b>&nbsp;&nbsp;{fromDate:date("d M  Y")}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>End Date:</b>&nbsp;&nbsp;{toDate:date("d M  Y")}',
         '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Generated on:</b>&nbsp;&nbsp;{generationDate:date("d M Y")}</p> <br/>',
-        '<table padding="15px;" border="1px solid black;"><tr><th><b>Charge type</b></th><th><b>Total Milk delivered</b></th><th><b>Price/Liter</b></th><th><b>Total amount</b></th></tr>',
-        '<tr><td><b>CM</b></td><td>{totalCmQty}</td><td>{cmPerQuantityPrice:inMoney}</td><td><b>{totalCmPrice:inMoney}</b></td></tr>',
+        '<table class=ex2 border="1px solid black;"><tr><th><b>Charge type</b></th><th><b>Total Milk delivered</b></th><th><b>Price/Liter</b></th><th><b>Total amount</b></th></tr>',
         '<tr><td><b>BM</b></td><td>{totalBmQty}</td><td>{bmPerQuantityPrice:inMoney}</td><td><b>{totalBmPrice:inMoney}</b></td></tr>',
+        '<tr><td><b>CM</b></td><td>{totalCmQty}</td><td>{cmPerQuantityPrice:inMoney}</td><td><b>{totalCmPrice:inMoney}</b></td></tr>',
         '<tr><td><b>Others</b></td><td></td><td></td><td>{otherCharges:inMoney}</td></tr>',
-        '<tr><td></td><td></td><td><b>Billable Amount</b></td><td><b>{billableAmount:inMoney}</b></td></tr></table>',
-        '<br />',
-        '<p><b>Discount:</b>{discount:inMoney}</p>',
-        '<p><b>Paid Amount:</b>{paidAmount:inMoney}</p>',
-        '<p><b>Previous months balance:</b>{previousMonthsBalanceAmount:inMoney}</p>',
-        '<p><b>Payable Amount:</b>{payableAmount:inMoney}</p>'
+        '<tr><td><b>Previous months balance:</b></td><td></td><td></td><td>{previousMonthsBalanceAmount:inMoney}</td></tr>',
+        '<tr><td><b>Discount:</b></td><td></td><td></td><td>{discount:inMoney}</td></tr>',
+        '<tr><td><b>Paid amount:</b></td><td></td><td></td><td>{paidAmount:inMoney}</td></tr>',
+        '<tr><td></td><td></td><td><b>Billable Amount</b></td><td><b>{payableAmount:inMoney}</b></td></tr></table>'
+        /*,'<br />',
+        '<p class=ex1><b>Discount:</b>{discount:inMoney}</p>',
+        '<p class=ex1><b>Paid Amount:</b>{paidAmount:inMoney}</p>',
+        '<p class=ex1><b>Payable Amount:</b>{payableAmount:inMoney}</p>'*/
     )
 });
 
@@ -131,6 +133,7 @@ CustomerBillGrid = Ext.extend(Ext.grid.GridPanel, {
                 }
             ],
             columns: [
+                new Ext.grid.RowNumberer(),
                 billGridRowExpander,
 /*
                 {xtype: 'datecolumn', dataIndex: 'fromDate', header: 'From Date', sortable: true, format: 'Y-m-d'},

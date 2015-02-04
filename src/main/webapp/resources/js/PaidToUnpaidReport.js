@@ -142,17 +142,17 @@ function createGrid(){
             ]
         }),
         viewConfig: {
-            forceFit: true
+            forceFit: true,
 
 //      Return CSS class to apply to rows depending upon data values
-            /*getRowClass: function(record, index) {
+            getRowClass: function(record, rowIndex, rowParams, store) {
                 var c = record.get('isPaid');
                 if (c) {
-                    return 'myRowClass';
+                    return 'green';
                 } else {
-                    return 'No';
+                    return 'red';
                 }
-            }*/
+            }
         },
         frame: false,
         iconCls: 'icon-grid'

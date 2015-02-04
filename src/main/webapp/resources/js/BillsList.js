@@ -33,6 +33,14 @@ var reader = new Ext.data.ArrayReader({}, [
     {name: 'dailyCmOrder', type: 'float'}
 ]);
 
+var rowClassFunction =  function (record, rowIndex, rowParams, store) {
+    var c = record.get('balanceAmount');
+    if (c <= 0) {
+        return 'green';
+    } else {
+        return 'red';
+    }
+}
 billsListStore = new Ext.data.JsonStore({
     restful: true,
     autoLoad: false,
@@ -74,24 +82,9 @@ billsListStore = new Ext.data.JsonStore({
         load: function (store, records, options) {
             var gridPanel = Ext.getCmp('billsListGridId');
             gridPanel.store.data = store.data;
+            gridPanel.getView().getRowClass = rowClassFunction;
             gridPanel.getView().refresh(true);
             gridPanel.setTitle("Bills")
-        },
-        update: function (store, record, operation) {
-            var values = record.data;
-            var jsonValues = Ext.encode(values);
-            Ext.Ajax.request({
-                url: './rest/bill/',
-                method: 'PUT',
-                headers: {'Content-Type': 'application/json; charset=utf-8'},
-                success: function (response, opts) {
-                    PageBus.publish("CustomerBillGrid.Bill.modified", record.data);
-                },
-                failure: function (response, opts) {
-                    console.log('server-side failure with status code ' + response.status);
-                },
-                params: jsonValues
-            });
         }
     }
 });
@@ -108,18 +101,20 @@ var editor = new Ext.ux.grid.RowEditor({
 
 billListGridRowExpander = new Ext.ux.grid.RowExpander({
     tpl: new Ext.XTemplate(
-        '<br/><p><b>Start Date:</b>&nbsp;&nbsp;{fromDate:date("d M  Y")}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>End Date:</b>&nbsp;&nbsp;{toDate:date("d M  Y")}',
+        '<br/><p class=ex1><b>Start Date:</b>&nbsp;&nbsp;{fromDate:date("d M  Y")}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>End Date:</b>&nbsp;&nbsp;{toDate:date("d M  Y")}',
         '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Generated on:</b>&nbsp;&nbsp;{generationDate:date("d M Y")}</p> <br/>',
-        '<table padding="15px;" border="1px solid black;"><tr><th><b>Charge type</b></th><th><b>Total Milk delivered</b></th><th><b>Price/Liter</b></th><th><b>Total amount</b></th></tr>',
+        '<table class=ex2 border="1px solid black;"><tr><th><b>Charge type</b></th><th><b>Total Milk delivered</b></th><th><b>Price/Liter</b></th><th><b>Total amount</b></th></tr>',
         '<tr><td><b>BM</b></td><td>{totalBmQty}</td><td>{bmPerQuantityPrice:inMoney}</td><td><b>{totalBmPrice:inMoney}</b></td></tr>',
         '<tr><td><b>CM</b></td><td>{totalCmQty}</td><td>{cmPerQuantityPrice:inMoney}</td><td><b>{totalCmPrice:inMoney}</b></td></tr>',
         '<tr><td><b>Others</b></td><td></td><td></td><td>{otherCharges:inMoney}</td></tr>',
-        '<tr><td></td><td></td><td><b>Billable Amount</b></td><td><b>{billableAmount:inMoney}</b></td></tr></table>',
-        '<br />',
-        '<p><b>Discount:</b>{discount:inMoney}</p>',
-        '<p><b>Paid Amount:</b>{paidAmount:inMoney}</p>',
-        '<p><b>Previous months balance:</b>{previousMonthsBalanceAmount:inMoney}</p>',
-        '<p><b>Payable Amount:</b>{payableAmount:inMoney}</p>'
+        '<tr><td><b>Previous months balance:</b></td><td></td><td></td><td>{previousMonthsBalanceAmount:inMoney}</td></tr>',
+        '<tr><td><b>Discount:</b></td><td></td><td></td><td>{discount:inMoney}</td></tr>',
+        '<tr><td><b>Paid amount:</b></td><td></td><td></td><td>{paidAmount:inMoney}</td></tr>',
+        '<tr><td></td><td></td><td><b>Billable Amount</b></td><td><b>{payableAmount:inMoney}</b></td></tr></table>'
+        /*,'<br />',
+         '<p class=ex1><b>Discount:</b>{discount:inMoney}</p>',
+         '<p class=ex1><b>Paid Amount:</b>{paidAmount:inMoney}</p>',
+         '<p class=ex1><b>Payable Amount:</b>{payableAmount:inMoney}</p>'*/
     )
 });
 
@@ -207,7 +202,6 @@ BillsList = Ext.extend(Ext.grid.GridPanel, {
                 {xtype: 'gridcolumn', dataIndex: 'phone', header: 'Phone', sortable: true},
                 {xtype: 'gridcolumn', dataIndex: 'dailyBmOrder', header: 'Daily BM Order', sortable: true},
                 {xtype: 'gridcolumn', dataIndex: 'dailyCmOrder', header: 'Daily CM Order', sortable: true}
-
             ]
         });
 

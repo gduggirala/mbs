@@ -5,6 +5,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Welcome</title>
+    <link rel="stylesheet" type="text/css" href="${rootURL}resources/css/styles.css"/>
     <link rel="stylesheet" type="text/css" href="${rootURL}resources/ext/resources/css/ext-all.css"/>
     <link rel="stylesheet" type="text/css" href="${rootURL}resources/ext/ux/css/ux-all.css"/>
     <link rel="stylesheet" type="text/css" href="${rootURL}resources/ext/shared/icons/silk.css"/>

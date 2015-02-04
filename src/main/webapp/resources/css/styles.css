@@ -1,0 +1,15 @@
+.red {
+    background-color: #FFDCDC !important;
+}
+.green {
+    background-color: #D6FFEF !important;
+}
+p.ex1 {
+    padding: 0px 0px 0px 2cm;
+}
+table.ex2 {
+    padding: 0px 0px 0px 2cm;
+}
+th.ex3, td.ex3 {
+    border: 1px solid black;
+}

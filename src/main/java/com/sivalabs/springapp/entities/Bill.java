@@ -258,11 +258,16 @@ public class Bill {
 
     public Double getBillableAmount() {
         //Billable amount
-        return (totalCmPrice==null?0:totalCmPrice) + (totalBmPrice==null?0:totalBmPrice) + (otherCharges==null?0:otherCharges);
+        return (totalCmPrice==null?new Double(0):totalCmPrice) + (totalBmPrice==null?new Double(0):totalBmPrice) + (otherCharges==null?new Double(0):otherCharges);
     }
 
     public Double getPayableAmount() {
-        return ((totalCmPrice==null?0:totalCmPrice) + (totalBmPrice==null?0:totalBmPrice) + (otherCharges==null?0:otherCharges)) -
-                ((discount==null?0:discount) + (previousMonthsBalanceAmount==null?0:previousMonthsBalanceAmount) + (paidAmount==null?0:paidAmount));
+        double discountedBalanceAndPayableAmount = ((discount==null?new Double(0):discount) + (previousMonthsBalanceAmount==null?new Double(0):previousMonthsBalanceAmount) + (paidAmount==null?new Double(0):paidAmount));
+        double totalCmBmAndOtherChargesAmount = ((totalCmPrice==null?new Double(0):totalCmPrice) + (totalBmPrice==null?new Double(0):totalBmPrice) + (otherCharges==null?new Double(0):otherCharges));
+        if(discountedBalanceAndPayableAmount < 0){
+            return totalCmBmAndOtherChargesAmount + discountedBalanceAndPayableAmount;
+        }else {
+            return totalCmBmAndOtherChargesAmount - discountedBalanceAndPayableAmount;
+        }
     }
 }
