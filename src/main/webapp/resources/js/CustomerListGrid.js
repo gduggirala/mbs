@@ -26,7 +26,7 @@ customerListStore = new Ext.data.JsonStore({
     root: 'users',
     totalProperty: 'total',
     fields: [
-        {name: 'name',type: 'string'},{name: 'email',type: 'string'},{name: 'sector',type: 'string'},{name:'orderStartDate',type:'date',format:'Y-m-d'},
+        {name: 'id',type: 'int'},{name: 'name',type: 'string'},{name: 'email',type: 'string'},{name: 'sector',type: 'string'},{name:'orderStartDate',type:'date',format:'Y-m-d'},
         {name: 'phone',type: 'string'},{name: 'address1',type: 'string'},{name: 'address2',type: 'string'},
         {name: 'address3',type: 'string'},{name: 'city',type: 'string'},{name: 'zip',type: 'string'},
         {name: 'dailyCmOrder',type: 'float'},{name: 'dailyBmOrder',type: 'float'},
@@ -105,13 +105,72 @@ CustomerListGrid = Ext.extend(Ext.grid.GridPanel, {
             viewConfig: {
                 forceFit: true
             },
-            tbar: [{
-                text: 'Add',
-                iconCls: 'silk-user-add',
-                handler: onAdd
-            },'-'],
+            tbar: [
+                {
+                    text: 'Add',
+                    iconCls: 'silk-user-add',
+                    handler: onAdd
+                },
+                '->',
+                {
+                    xtype: 'textfield',
+                    emptyText:'Search by Name, eMail, Sector, Phone and Serial # and hit ENTER',
+                    width:400,
+                    label:'Search',
+                    enableKeyEvents: true,
+                    listeners: {
+                        'specialkey': function (thisObj, eventObject) {
+                            var customerListGridMask = new Ext.LoadMask(Ext.get('customerListGridId'), {msg:"Please wait..."});
+                            customerListGridMask.show();
+                            var grid = Ext.getCmp('customerListGridId');
+                            var store = Ext.getCmp('customerListGridId').getStore();
+                            var searchString = thisObj.getValue();
+                            // e.HOME, e.END, e.PAGE_UP, e.PAGE_DOWN,
+                            // e.TAB, e.ESC, arrow keys: e.LEFT, e.RIGHT, e.UP, e.DOWN
+                            var pressedKey = eventObject.getKey();
+                            if(pressedKey !=  eventObject.ENTER){
+                                if((pressedKey == eventObject.BACKSPACE || pressedKey == eventObject.DELETE) && searchString.length == 1){
+                                    store.clearFilter();
+                                }
+                                if(eventObject.getKey() == eventObject.ESC){
+                                    thisObj.setValue("");
+                                    store.clearFilter();
+                                }
+                                customerListGridMask.hide();
+                                grid.selModel.selectFirstRow();
+                                return;
+                            }
+
+                            if(searchString.length <= 0 ){
+                                store.clearFilter();
+                                customerListGridMask.hide();
+                                grid.selModel.selectFirstRow();
+                                return;
+                            }
+                            store.clearFilter();
+                            store.filterBy(function (record) {
+                                var myRegExp = new RegExp(searchString);
+                                var recordName = record.get('name');
+                                var recordEmail = record.get('email')
+                                var recordSector = record.get('sector');
+                                var recordPhone = record.get('phone');
+                                var recordGivenSerailNumber = record.get('givenSerialNumber');
+                                var recordReferredBy = record.get('referredBy');
+                                if (myRegExp.test(recordName) || myRegExp.test(recordEmail) || myRegExp.test(recordSector) ||
+                                    myRegExp.test(recordPhone) || myRegExp.test(recordGivenSerailNumber) || myRegExp.test(recordReferredBy)) {
+                                    customerListGridMask.hide();
+                                    return record;
+                                }
+                            });
+                            grid.selModel.selectFirstRow();
+                            customerListGridMask.hide();
+                        }
+                    }
+                }
+            ],
             columns: [
                 new Ext.grid.RowNumberer(),
+                {xtype: 'numbercolumn',dataIndex: 'id',header: 'Customer Id',format:'0', sortable: true},
                 {xtype: 'numbercolumn',dataIndex: 'givenSerialNumber',header: 'Serial #',format:'0', sortable: true,
                     editor: {
                         xtype: 'numberfield',
@@ -177,11 +236,6 @@ CustomerListGrid = Ext.extend(Ext.grid.GridPanel, {
                 {xtype: 'gridcolumn',dataIndex: 'referredBy',header: 'Referred by',sortable: true,
                     editor: {xtype: 'textfield',allowBlank: true}
                 }
-              /*  {xtype: 'gridcolumn',dataIndex: 'address1',header: 'Address 1',sortable: true},
-                {xtype: 'gridcolumn',dataIndex: 'address2',header: 'Address 2',sortable: true},
-                {xtype: 'gridcolumn',dataIndex: 'address3',header: 'Address 3',sortable: true},
-                {xtype: 'gridcolumn',dataIndex: 'city',header: 'City',sortable: true},
-                {xtype: 'gridcolumn',dataIndex: 'zip',header: 'Zip',sortable: true}, */
             ],
             listeners:{
                 'viewready':function(grid){

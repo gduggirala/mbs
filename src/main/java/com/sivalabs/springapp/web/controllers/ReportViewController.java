@@ -2,6 +2,7 @@ package com.sivalabs.springapp.web.controllers;
 
 import com.sivalabs.springapp.DateUtils;
 import com.sivalabs.springapp.entities.DailyOrder;
+import com.sivalabs.springapp.reports.pojo.BillListReport;
 import com.sivalabs.springapp.reports.pojo.DailyOrderGround;
 import com.sivalabs.springapp.reports.service.ReportsGenerator;
 import com.sivalabs.springapp.services.DailyOrderService;
@@ -13,8 +14,11 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * User: duggirag
@@ -39,6 +43,18 @@ public class ReportViewController {
         List<DailyOrderGround> dailyOrderGroundList = reportsGenerator.generateDailyOrderGroundReport(dateOfConsideration);
         ModelAndView modelAndView = new ModelAndView("pdfView", "dailyOrderGroundList", dailyOrderGroundList);
         modelAndView.addObject("formattedDateForReport",formattedDateForReport);
+        return modelAndView;
+    }
+
+    @RequestMapping(value = "/generate/bills.pdf", method = RequestMethod.GET)
+    ModelAndView generateBills(HttpServletRequest request,
+                             HttpServletResponse response) throws Exception {
+        LocalDate localDate = LocalDate.now();
+        LocalDate previousMonth = localDate.minusMonths(1);
+        LocalDate previousPreviousMonth = localDate.minusMonths(2);
+        Date dateOfConsideration = new Date();
+        List<BillListReport> billListReports = reportsGenerator.generateBillReport(previousMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.US));
+        ModelAndView modelAndView = new ModelAndView("billsPdfView", "billListReports", billListReports);
         return modelAndView;
     }
 

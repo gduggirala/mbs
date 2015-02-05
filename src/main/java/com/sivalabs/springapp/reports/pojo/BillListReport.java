@@ -44,6 +44,7 @@ public class BillListReport {
     private String phone;
     private Double dailybmOrder;
     private Double dailyCmOrder;
+    private Long customerId;
 
     public Long getId() {
         return id;
@@ -281,5 +282,13 @@ public class BillListReport {
 
     public void setDailyCmOrder(Double dailyCmOrder) {
         this.dailyCmOrder = dailyCmOrder;
+    }
+
+    public Long getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
     }
 }

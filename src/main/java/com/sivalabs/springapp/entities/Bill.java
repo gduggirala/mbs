@@ -90,6 +90,15 @@ public class Bill {
     @Transient
     private Double payableAmount;
 
+    @Transient
+    private String customerName;
+
+    @Transient
+    private Long customerId;
+
+    @Transient
+    private String customerPhone;
+
     public Long getId() {
         return id;
     }
@@ -269,5 +278,17 @@ public class Bill {
         }else {
             return totalCmBmAndOtherChargesAmount - discountedBalanceAndPayableAmount;
         }
+    }
+
+    public String getCustomerName() {
+        return user.getName();
+    }
+
+    public Long getCustomerId() {
+        return user.getId();
+    }
+
+    public String getCustomerPhone() {
+        return user.getPhone();
     }
 }
