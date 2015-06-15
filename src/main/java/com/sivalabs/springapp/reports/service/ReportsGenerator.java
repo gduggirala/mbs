@@ -36,8 +36,8 @@ public class ReportsGenerator {
     public List<DailyOrderReport> generateDailyOrderReport(String formattedDate) throws SQLException {
 
         String sql = "SELECT sum(d0.bmOrder) AS 'totalBmOrder', (sum(d0.bmOrder) * u.bmPrice) as 'bmRevenue',  sum(d0.cmOrder) AS 'totalCmOrder', (sum(d0.cmOrder) * u.cmPrice) as 'cmRevenue', u.sector AS 'sector' " +
-                " FROM daily_order d0 " +
-                " INNER JOIN users u ON d0.user_Id=u.id " +
+                " FROM DAILY_ORDER d0 " +
+                " INNER JOIN USERS u ON d0.user_Id=u.id " +
                 " WHERE orderDate = ? and u.isActive=true " +
                 " GROUP BY u.sector";
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
@@ -52,8 +52,8 @@ public class ReportsGenerator {
     public List<DailyOrderReport> generateRevenueTrend(){
         String sql = "SELECT (SUM(d0.bmOrder) * u.bmPrice) AS 'bmRevenue', (SUM(d0.cmOrder) * u.cmPrice) AS 'cmRevenue',  " +
                 " DATE_FORMAT(d0.orderDate, '%M') AS 'orderMonth' " +
-                "FROM daily_order d0 " +
-                "INNER JOIN users u ON d0.user_Id=u.id " +
+                "FROM DAILY_ORDER d0 " +
+                "INNER JOIN USERS u ON d0.user_Id=u.id " +
                 "WHERE u.isActive= TRUE " +
                 "GROUP BY YEAR(d0.orderDate), MONTH(d0.orderDate)";
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
@@ -63,9 +63,9 @@ public class ReportsGenerator {
 
     public List<DailyOrderGround> generateDailyOrderGroundReport(String formattedDate) throws SQLException{
         String sql ="SELECT d0.id as 'id', d0.bmOrder AS 'bmOrder', d0.cmOrder AS 'cmOrder', u.sector AS 'sector', u.name AS 'name', u.phone AS 'phone', d0.orderDate AS 'orderDate', u.givenSerialNumber AS 'givenSerialNumber', u.address1 as 'address1' " +
-                "FROM daily_order d0 " +
-                "INNER JOIN users u ON d0.user_Id=u.id " +
-                "WHERE orderDate = ? AND u.isActive= TRUE";
+                "FROM DAILY_ORDER d0 " +
+                "INNER JOIN USERS u ON d0.user_Id=u.id " +
+                "WHERE orderDate = ? AND u.isActive= TRUE ORDER BY `sector`";
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         List<DailyOrderGround> dailyOrderGroundList = jdbcTemplate.query(sql, new Object[]{formattedDate}, new BeanPropertyRowMapper(DailyOrderGround.class));
         return dailyOrderGroundList;
@@ -78,8 +78,8 @@ public class ReportsGenerator {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("months", months);
         String sql =String.format("SELECT b0.*, DATE_FORMAT(b0.toDate, '%%M') AS 'month', u.id as 'customerId', u.name, u.sector, u.address1, u.givenSerialNumber, u.phone, u.dailybmOrder, u.dailyCmOrder " +
-                "FROM bill b0 " +
-                "INNER JOIN users u ON b0.USER_ID = u.id where DATE_FORMAT(b0.toDate, '%%M') in ('%s', '%s')",previousMonth, previousPreviousMonth);
+                "FROM BILL b0 " +
+                "INNER JOIN USERS u ON b0.USER_ID = u.id where DATE_FORMAT(b0.toDate, '%%M') in ('%s', '%s')",previousMonth, previousPreviousMonth);
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         List<BillListReport> billListReports = jdbcTemplate.query(sql, new BeanPropertyRowMapper(BillListReport.class));
         return billListReports;
@@ -91,8 +91,8 @@ public class ReportsGenerator {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("months", months);
         String sql =String.format("SELECT b0.*, DATE_FORMAT(b0.toDate, '%%M') AS 'month', u.id as 'customerId', u.name, u.sector, u.address1, u.givenSerialNumber, u.phone, u.dailybmOrder, u.dailyCmOrder " +
-                "FROM bill b0 " +
-                "INNER JOIN users u ON b0.USER_ID = u.id where DATE_FORMAT(b0.toDate, '%%M') in ('%s')",month);
+                "FROM BILL b0 " +
+                "INNER JOIN USERS u ON b0.USER_ID = u.id where DATE_FORMAT(b0.toDate, '%%M') in ('%s')",month);
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         List<BillListReport> billListReports = jdbcTemplate.query(sql, new BeanPropertyRowMapper(BillListReport.class));
         return billListReports;

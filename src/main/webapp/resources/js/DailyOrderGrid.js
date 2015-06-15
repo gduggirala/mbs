@@ -74,6 +74,17 @@ DailyOrdersGrid = Ext.extend(Ext.grid.GridPanel, {
     store: dailyOrderGroupStore,
     plugins: [editor],
     view: groupingView,
+    viewConfig: {
+        forceFit: true,
+        getRowClass: function(record, rowIndex, rowParams, store) {
+            var c = record.get('active');
+            if (c) {
+                return 'green';
+            } else {
+                return 'red';
+            }
+        }
+    },
     initComponent: function () {
         Ext.applyIf(this, {
             tbar: [{
@@ -136,7 +147,8 @@ DailyOrdersGrid = Ext.extend(Ext.grid.GridPanel, {
             dailyOrderStore.proxy.conn.url = './rest/dailyOrders/search?userId=' + messageFromPublisher.id;
             selectedUserId = messageFromPublisher.id;
             dailyOrderStore.load();
-            Ext.getCmp('dailyOrderGridId').setTitle(messageFromPublisher.data.name+"'s daily orders")
+           // Ext.getCmp('dailyOrderGridId').setTitle(messageFromPublisher.data.name+"'s daily orders")
+            Ext.getCmp('dailyOrderConsumptionPanel').setTitle(messageFromPublisher.data.name+"'s Consumption")
         }
 
         function processDailyOrderChanged(topic, messageFromPublisher, subscriberData) {

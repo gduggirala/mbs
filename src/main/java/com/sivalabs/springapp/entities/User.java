@@ -22,7 +22,7 @@ public class User {
 
     @Column(nullable = false)
     private String name;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = false)
     private String email;
     @Column(nullable = true)
     private String password;
@@ -44,9 +44,9 @@ public class User {
     private Double dailyCmOrder;
     @Column
     private Double dailyBmOrder;
-    @Column
+    @Column(nullable = false)
     private Double cmPrice;
-    @Column
+    @Column(nullable = false)
     private Double bmPrice;
     @Column
     private Boolean isActive;

@@ -102,9 +102,6 @@ CustomerListGrid = Ext.extend(Ext.grid.GridPanel, {
                     }
                 }
             }),
-            viewConfig: {
-                forceFit: true
-            },
             tbar: [
                 {
                     text: 'Add',
@@ -237,6 +234,17 @@ CustomerListGrid = Ext.extend(Ext.grid.GridPanel, {
                     editor: {xtype: 'textfield',allowBlank: true}
                 }
             ],
+            viewConfig: {
+                forceFit: true,
+                getRowClass: function(record, rowIndex, rowParams, store) {
+                    var c = record.get('active');
+                    if (c) {
+                        return 'green';
+                    } else {
+                        return 'red';
+                    }
+                }
+            },
             listeners:{
                 'viewready':function(grid){
                     grid.selModel.selectFirstRow();

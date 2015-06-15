@@ -185,6 +185,13 @@ CustomerBillGrid = Ext.extend(Ext.grid.GridPanel, {
                     text:'Calculate current month bill',
                     iconCls:'silk-calculator',
                     handler:calculateCurrentMonthBill
+                },'->',
+                {
+                   iconCls:'silk-table-refresh',
+                   text:'Refresh',
+                   handler:function(){
+                       customerBillListStore.load();
+                   }
                 }
             ],
             columns: [
@@ -254,7 +261,8 @@ CustomerBillGrid = Ext.extend(Ext.grid.GridPanel, {
             customerBillListStore.proxy.conn.url = './rest/bill/user/' + messageFromPublisher.id;
             selectedUserId = messageFromPublisher.id;
             customerBillListStore.load();
-            Ext.getCmp('customerBillGridId').setTitle(messageFromPublisher.data.name + "'s bill");
+           // Ext.getCmp('customerBillGridId').setTitle(messageFromPublisher.data.name + "'s bill");
+            Ext.getCmp('customerBillPanel').setTitle(messageFromPublisher.data.name+"'s Bills")
 
         }
 

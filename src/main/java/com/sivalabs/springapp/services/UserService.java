@@ -6,6 +6,7 @@ package com.sivalabs.springapp.services;
 import com.sivalabs.springapp.entities.User;
 import com.sivalabs.springapp.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,7 +47,7 @@ public class UserService
 
 	public List<User> findAll() {
 		//return userDao.findAll();
-		return userRepository.findAll();
+		return userRepository.findAll(new Sort(Sort.DEFAULT_DIRECTION,"sector"));
 	}
 
 	public User create(User user) {

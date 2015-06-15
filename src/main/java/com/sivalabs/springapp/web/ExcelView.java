@@ -1,7 +1,5 @@
 package com.sivalabs.springapp.web;
 
-import ch.lambdaj.Lambda;
-import ch.lambdaj.group.Group;
 import com.sivalabs.springapp.reports.pojo.DailyOrderGround;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -14,10 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
-
-import static ch.lambdaj.Lambda.by;
-import static ch.lambdaj.Lambda.on;
-import static ch.lambdaj.Lambda.sum;
 
 /**
  * User: duggirag

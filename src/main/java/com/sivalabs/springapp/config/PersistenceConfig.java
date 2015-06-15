@@ -63,6 +63,8 @@ public class PersistenceConfig {
 
 		Properties jpaProperties = new Properties();
 		jpaProperties.put("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
+        jpaProperties.put("hibernate.dialect", env.getProperty("hibernate.dialect"));
+        jpaProperties.put("hibernate.show_sql", env.getProperty("hibernate.show_sql"));
 		factory.setJpaProperties(jpaProperties);
 
 		factory.afterPropertiesSet();

@@ -69,11 +69,15 @@ public class ReportsResource {
         Map<String, Object> userMap = new HashMap<>();
         Double unpaidAmount =(double) 0;
         Double paidAmount =(double) 0;
+        Double totalRevenue = (double) 0;
         if(!unpaidBills.isEmpty()){
             unpaidAmount = sumFrom(unpaidBills).getPayableAmount();
         }
         if(!paidBills.isEmpty()){
             paidAmount = sumFrom(paidBills).getPaidAmount();
+        }
+        if (!billList.isEmpty()){
+            totalRevenue = sumFrom(billList).getBillableAmount();
         }
         userMap.put("success",Boolean.TRUE);
         userMap.put("billList",billList);
@@ -82,8 +86,9 @@ public class ReportsResource {
         userMap.put("paidBillsCount",paidBills.size());
         userMap.put("unpaidBillsCount",unpaidBills.size());
         userMap.put("unpaidAmount",unpaidAmount);
-        userMap.put("amountYetToBePaid",unpaidAmount-paidAmount);
+        userMap.put("amountYetToBePaid",totalRevenue-paidAmount);
         userMap.put("paidAmount",paidAmount);
+        userMap.put("totalRevenue",totalRevenue);
         userMap.put("forMonth",localDate.minusMonths(1).getMonth().getDisplayName(TextStyle.FULL, Locale.US));
         return new ResponseEntity<>(userMap, HttpStatus.OK);
     }

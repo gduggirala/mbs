@@ -91,10 +91,11 @@ function paidToUnpaidBillReport() {
             data.formattedPaidAmount = Ext.mf.format(data.paidAmount);
             data.formattedUnPaidAmount = Ext.mf.format(data.unpaidAmount);
             data.formattedAmountYetToBePaid = Ext.mf.format(data.amountYetToBePaid);
+            data.formattedTotalRevenue = Ext.mf.format(data.totalRevenue);
             var tpl = new Ext.XTemplate(
                 '<table border="1" style="width:100%"><tr bgcolor="#C8C8C8">',
-                '<td><b># Of Paid Bills</b></td><td><b>Total Paid amount</b></td><td><b># Of Unpaid Bills</b></td><td><b>Total Unpaid amount</b></td><td><b>Yet to Pay</b></td></tr>',
-                '<tr bgcolor="#C8C8C8"><td><b>{paidBillsCount}</b></td><td><b>{formattedPaidAmount}</b></td><td><b>{unpaidBillsCount}</b></td><td><b>{formattedUnPaidAmount}</b></td><td><b>{formattedAmountYetToBePaid}</b></td></tr>',
+                '<td><b># Of Paid Bills</b></td><td><b>Total revenue</b></td><td><b>Total Paid amount</b></td><td><b># Of Unpaid Bills</b></td><td><b>Yet to Pay</b></td></tr>',
+                '<tr bgcolor="#C8C8C8"><td><b>{paidBillsCount}</b></td><td><b>{formattedTotalRevenue}</b></td><td><b>{formattedPaidAmount}</b></td><td><b>{unpaidBillsCount}</b></td><td><b>{formattedAmountYetToBePaid}</b></td></tr>',
                 '</table>'
             );
             var panel = Ext.getCmp('paidToUnpaidReportId');
