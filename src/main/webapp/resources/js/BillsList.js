@@ -216,10 +216,14 @@ BillsList = Ext.extend(Ext.grid.GridPanel, {
                     valueField: 'monthId',
                     displayField: 'displayText'
                 },'->',{
-                    text: 'PDF',
-                    iconCls: 'silk-pdf',
+                    text: 'Excel',
+                    iconCls: 'silk-page-excel',
                     handler: downloadBillsPdf
                 },{
+                      text: 'PDF',
+                      iconCls: 'silk-pdf',
+                      handler: downloadBillsPdf
+                  },{
                     iconCls:'silk-table-refresh',
                     text:'Refresh',
                     handler:function(){
@@ -264,7 +268,7 @@ BillsList = Ext.extend(Ext.grid.GridPanel, {
                             }
                             store.clearFilter();
                             store.filterBy(function (record) {
-                                var myRegExp = new RegExp(searchString);
+                                var myRegExp = new RegExp(searchString,'i');
                                 var recordName = record.get('name');
                                 var customerId = record.get('customerId');
                                 var recordPhone = record.get('phone');
@@ -343,6 +347,9 @@ BillsList = Ext.extend(Ext.grid.GridPanel, {
 
         function downloadBillsPdf(){
             window.open('./generate/bills.pdf');
+        }
+        function downloadBillsPdf(){
+            window.open('./generate/bills.xls');
         }
         PageBus.subscribe("DailyOrderGrid.DailyOrder.modified", this,processBillChanged,'BillGrid');
         PageBus.subscribe("BillsList.Bill.modified", this, processBillChanged, 'BillGrid');

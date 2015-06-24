@@ -70,7 +70,13 @@ var reader = new Ext.data.ArrayReader({}, [
 
 var groupingView = new Ext.grid.GroupingView({
     forceFit: false,
-    groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "Items" : "Item"]})'
+    groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "Items" : "Item"]})',
+    getRowClass: function(record, rowIndex, rowParams, store) {
+                        var c = record.get('active');
+                        if (!c) {
+                            return 'red';
+                        }
+                    }
 });
 
 var editor = new Ext.ux.grid.RowEditor({
@@ -146,7 +152,7 @@ CustomerListGrid = Ext.extend(Ext.grid.GridPanel, {
                             }
                             store.clearFilter();
                             store.filterBy(function (record) {
-                                var myRegExp = new RegExp(searchString);
+                                var myRegExp = new RegExp(searchString,'i');
                                 var recordName = record.get('name');
                                 var recordEmail = record.get('email')
                                 var recordSector = record.get('sector');
@@ -235,15 +241,7 @@ CustomerListGrid = Ext.extend(Ext.grid.GridPanel, {
                 }
             ],
             viewConfig: {
-                forceFit: true,
-                getRowClass: function(record, rowIndex, rowParams, store) {
-                    var c = record.get('active');
-                    if (c) {
-                        return 'green';
-                    } else {
-                        return 'red';
-                    }
-                }
+                forceFit: true
             },
             listeners:{
                 'viewready':function(grid){

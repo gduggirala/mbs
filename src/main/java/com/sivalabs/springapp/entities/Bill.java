@@ -99,6 +99,9 @@ public class Bill {
     @Transient
     private String customerPhone;
 
+    @Transient
+    private Boolean isPaid;
+
     public Long getId() {
         return id;
     }
@@ -290,5 +293,9 @@ public class Bill {
 
     public String getCustomerPhone() {
         return user.getPhone();
+    }
+
+    public Boolean isPaid() {
+        return !(this.getPaidAmount() <=0 && this.balanceAmount > 0);
     }
 }

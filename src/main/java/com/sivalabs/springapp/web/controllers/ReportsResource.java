@@ -8,6 +8,7 @@ import com.sivalabs.springapp.reports.pojo.DailyOrderGround;
 import com.sivalabs.springapp.reports.pojo.DailyOrderReport;
 import com.sivalabs.springapp.reports.service.ReportsGenerator;
 import com.sivalabs.springapp.services.BillService;
+import org.hamcrest.Matchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,10 +23,10 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.*;
+import java.util.regex.Matcher;
 
 import static ch.lambdaj.Lambda.*;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.*;
 
 /**
  * User: gduggirala
@@ -65,7 +66,7 @@ public class ReportsResource {
         LocalDate localDate = LocalDate.now();
         List<Bill> billList = billService.findByMonth(localDate.minusMonths(1).getMonth(), localDate.minusMonths(1).getYear());
         List<Bill> paidBills = Lambda.filter(having(on(Bill.class).getPaidAmount(),greaterThan(0d)),billList);
-        List<Bill> unpaidBills = Lambda.filter(having(on(Bill.class).getPaidAmount(),lessThan(1d)),billList);
+        List<Bill> unpaidBills = Lambda.filter(having(on(Bill.class).isPaid(),is(Boolean.FALSE)),billList);
         Map<String, Object> userMap = new HashMap<>();
         Double unpaidAmount =(double) 0;
         Double paidAmount =(double) 0;

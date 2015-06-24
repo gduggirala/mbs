@@ -112,6 +112,7 @@ function paidToUnpaidBillReport() {
 function createGrid(){
     var grid = new Ext.grid.GridPanel({
         store: paidAndUnpaidBillsStore,
+        id:'paidToUnpaidReportGridId',
         flex:1,
         autoscroll:1,
         colModel: new Ext.grid.ColumnModel({
@@ -158,6 +159,7 @@ function createGrid(){
         frame: false,
         iconCls: 'icon-grid'
     });
+
     Ext.getCmp('paidToUnpaidReportMaster').add(grid);
     Ext.getCmp('paidToUnpaidReportMaster').doLayout();
 }

@@ -58,6 +58,20 @@ public class ReportViewController {
         return modelAndView;
     }
 
+    @RequestMapping(value = "/generate/bills.xls", method = RequestMethod.GET)
+    ModelAndView generateBillsXls(HttpServletRequest request,
+                               HttpServletResponse response) throws Exception {
+        LocalDate localDate = LocalDate.now();
+        LocalDate previousMonth = localDate.minusMonths(1);
+        LocalDate previousPreviousMonth = localDate.minusMonths(2);
+        Date dateOfConsideration = new Date();
+        String billingMonth = previousMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+        List<BillListReport> billListReports = reportsGenerator.generateBillReport(previousMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.US));
+        ModelAndView modelAndView = new ModelAndView("billsXlsView", "billListReports", billListReports);
+        modelAndView.getModelMap().put("billingMonth",billingMonth);
+        return modelAndView;
+    }
+
     @RequestMapping(value = "/generate/dailyOrder.xls", method = RequestMethod.GET)
     ModelAndView generateExcel(HttpServletRequest request,
                              HttpServletResponse response) throws Exception {
