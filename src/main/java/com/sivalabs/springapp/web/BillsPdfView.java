@@ -1,5 +1,6 @@
 package com.sivalabs.springapp.web;
 
+import ch.lambdaj.group.Group;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfPCell;
@@ -15,6 +16,10 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 
+import static ch.lambdaj.Lambda.by;
+import static ch.lambdaj.Lambda.group;
+import static ch.lambdaj.Lambda.on;
+
 /**
  * User: duggirag
  * Date: 2/5/15
@@ -24,18 +29,23 @@ public class BillsPdfView extends AbstractItextPdfView {
     protected void buildPdfDocument(Map<String, Object> model, Document document,
                                     PdfWriter writer, HttpServletRequest request, HttpServletResponse response) throws Exception {
         List<BillListReport> billListReports = (List<BillListReport>) model.get("billListReports");
+        Group<BillListReport> billListReportGroup = group(billListReports, by(on(BillListReport.class).getSector()));
         response.setHeader("content-disposition", "Bills List");
         response.setHeader("Content-Type", "application/octet-stream");
         response.setHeader("Pragma", "public");
-        int i=0;
-        for(BillListReport billListReport:billListReports){
-            i++;
-            document.add(createBillTable(billListReport));
-            document.add(new Paragraph("      "+Chunk.NEWLINE));
-            if(i==4){
-                document.newPage();
-                i=0;
+        for (String sector:billListReportGroup.keySet()) {
+            List<BillListReport> billListReports1 = billListReportGroup.find(sector);
+            int i = 0;
+            for (BillListReport billListReport : billListReports1) {
+                i++;
+                document.add(createBillTable(billListReport));
+                document.add(new Paragraph("      " + Chunk.NEWLINE));
+                if (i == 4) {
+                    document.newPage();
+                    i = 0;
+                }
             }
+            document.newPage();
         }
     }
 

@@ -46,7 +46,7 @@ public class ReportViewController {
         return modelAndView;
     }
 
-    @RequestMapping(value = "/generate/bills.pdf", method = RequestMethod.GET)
+    @RequestMapping(value = "/generate/billsPdf.pdf", method = RequestMethod.GET)
     ModelAndView generateBills(HttpServletRequest request,
                              HttpServletResponse response) throws Exception {
         LocalDate localDate = LocalDate.now();
@@ -58,7 +58,7 @@ public class ReportViewController {
         return modelAndView;
     }
 
-    @RequestMapping(value = "/generate/bills.xls", method = RequestMethod.GET)
+    @RequestMapping(value = "/generate/billsExcel.xls", method = RequestMethod.GET)
     ModelAndView generateBillsXls(HttpServletRequest request,
                                HttpServletResponse response) throws Exception {
         LocalDate localDate = LocalDate.now();

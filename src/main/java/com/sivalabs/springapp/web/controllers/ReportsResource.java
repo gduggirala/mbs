@@ -13,15 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.format.TextStyle;
+import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.regex.Matcher;
 
@@ -108,8 +107,15 @@ public class ReportsResource {
 
     @RequestMapping(value="/listBills", method= RequestMethod.GET, produces= MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> listBills() throws SQLException {
-        LocalDate localDate = LocalDate.now();
+    public ResponseEntity<Map<String, Object>> listBills(@RequestParam(required = false, value="month")String fullMonth) throws SQLException {
+        LocalDate localDate = null;
+        LocalDate tmp = LocalDate.now();
+        if (fullMonth == null || fullMonth.isEmpty()){
+            localDate = LocalDate.now();
+        }else {
+            LocalDate tempDate = LocalDate.of(tmp.getYear(),Month.valueOf(fullMonth.toUpperCase()),1);
+            localDate = tempDate.plusMonths(1);
+        }
         LocalDate previousMonth = localDate.minusMonths(1);
         LocalDate previousPreviousMonth = localDate.minusMonths(2);
         List<BillListReport> billListReports = reportsGenerator.generateBillReport(previousMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.US), previousPreviousMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.US));

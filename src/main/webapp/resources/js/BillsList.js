@@ -215,10 +215,35 @@ BillsList = Ext.extend(Ext.grid.GridPanel, {
                     },
                     valueField: 'monthId',
                     displayField: 'displayText'
+                },
+                // 'Show bills for the month:',
+                {
+                    xtype     : 'combo',
+                    typeAhead: true,
+                    triggerAction: 'all',
+                    lazyRender:true,
+                    hidden:true,
+                    width     : 100,
+                    mode: 'local',
+                    store     : new  Ext.data.ArrayStore({
+                        id:'monthFullNameStore',
+                        fields: [
+                            'monthFullName',
+                            'displayText'
+                        ],
+                        data: [ ['January', 'January'], ['February', 'February'], ['March', 'March'], ['April', 'April'], ['May', 'May'],
+                                ['June', 'June'], ['July', 'July'], ['August', 'August'], [ 'September', 'September'],
+                                ['October', 'October'], ['November', 'November'], ['December', 'December']]
+                    }),
+                    listeners:{
+                        'select':showMonthBill
+                    },
+                    valueField: 'monthId',
+                    displayField: 'displayText'
                 },'->',{
                     text: 'Excel',
                     iconCls: 'silk-page-excel',
-                    handler: downloadBillsPdf
+                    handler: downloadBillsExcel
                 },{
                       text: 'PDF',
                       iconCls: 'silk-pdf',
@@ -320,7 +345,14 @@ BillsList = Ext.extend(Ext.grid.GridPanel, {
         });
 
         function processBillChanged(topic, messageFromPublisher, subscriberData) {
-          //  billsListStore.proxy.conn.url = './rest/bill/user/' + selectedUserId;
+            var localUrl = billsListStore.proxy.conn.url + '?month=June';
+            billsListStore.proxy.conn.url = localUrl;
+            billsListStore.load();
+        }
+
+        function showMonthBill(combo, record, index){
+            var localUrl = billsListStore.proxy.url + '?month='+record.data.monthFullName;
+            billsListStore.proxy.conn.url = localUrl;
             billsListStore.load();
         }
 
@@ -346,10 +378,10 @@ BillsList = Ext.extend(Ext.grid.GridPanel, {
         }
 
         function downloadBillsPdf(){
-            window.open('./generate/bills.pdf');
+            window.open('./generate/billsPdf.pdf');
         }
-        function downloadBillsPdf(){
-            window.open('./generate/bills.xls');
+        function downloadBillsExcel(){
+            window.open('./generate/billsExcel.xls');
         }
         PageBus.subscribe("DailyOrderGrid.DailyOrder.modified", this,processBillChanged,'BillGrid');
         PageBus.subscribe("BillsList.Bill.modified", this, processBillChanged, 'BillGrid');

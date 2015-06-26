@@ -17,7 +17,7 @@ import java.util.Date;
 public class DateUtils {
 
     public static String getFormattedDateForReport(Date date){
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("d-MMM-yy");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("d-MM-yy");
         return simpleDateFormat.format(date);
     }
 
