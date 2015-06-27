@@ -10,13 +10,15 @@ DailyOrderReportsChart = Ext.extend(Ext.Panel, {
     collapsible:true,
     listeners: {
         render: function (thisPanel) {
-            dailyOrderReporter();
+           dailyOrderReporter();
         }
     },
     initComponent: function () {
         screenWidth = (Ext.getBody().getSize().width-50)/2;
+        sw = (Ext.getBody().getSize().width-50);
         dailyOrderReportChartUrl = '<img src="./rest/charts/dailyOrderReportChart?width='+screenWidth+'"/>';
-        dailyOrderRevenueTrendUrl = '<img src="./rest/charts/dailyOrderRevenueTrend?width='+screenWidth+'"/>';
+        dailyOrderRevenueTrendUrl = '<img src="./rest/charts/dailyRevenueTrend?width='+sw+'"/>';
+        monthlyRevenueTrendUrl = '<img src="./rest/charts/monthlyRevenueTrend?width='+screenWidth+'"/>';
         Ext.applyIf(this, {
             items: [
                 {
@@ -33,7 +35,7 @@ DailyOrderReportsChart = Ext.extend(Ext.Panel, {
                             xtype: 'panel',
                             autoScroll:true,
                             flex:1,
-                            html:dailyOrderRevenueTrendUrl
+                            html:monthlyRevenueTrendUrl
                         }/*,
                         {
                             xtype:'panel',
@@ -44,6 +46,12 @@ DailyOrderReportsChart = Ext.extend(Ext.Panel, {
 
                         }
 */                    ]
+                },
+                {
+                    xtype: 'panel',
+                    autoScroll:true,
+                    flex:1,
+                    html:dailyOrderRevenueTrendUrl
                 },
                 {
                     id: 'dailyOrderReportsChartId'
@@ -85,106 +93,3 @@ function dailyOrderReporter() {
         }
     });
 }
-/*dailyOrderReportStore = new Ext.data.JsonStore({
- autoLoad: false,
- restful: true,
- storeId: 'dailyOrderReportStoreId',
- url: './rest/report/dailyOrderReport', //Though nothing is mentioned here, the actual value will be given when processSelectedCustomer method is being executed.
- root: 'dailyOrderReport',
- fields: [
- {name: 'totalCmOrder', type: 'float'},
- {name: 'totalBmOrder', type: 'float'},
- {name: 'sector', type: 'string'}
- ],
- listeners: {
- load: function (store, records, options) {
- var tpl = new Ext.XTemplate(
- '<tpl for=".">',
- '<p>Sector:{values.data.sector}</p>',
- '<p>CM Order:{values.data.totalCmOrder}</p>',
- '<p>BM Order:{values.data.totalBmOrder}</p>',
- '<p>Total BM order:{values.parent.grandTotalCmOrder}</p>',
- '</tpl>'
- );
-
- var panelBody = Ext.getCmp('dailyOrderReportsChartId').body;
- tpl.overwrite(panelBody, store.data.items);
- Ext.getCmp('dailyOrderReportsChartId').body.highlight('#c3daf9', {block: true});
- },
- update: function (store, record, operation) {
-
- }
- }
- });*/
-
-
-/**
- DailyOrderReportsChart = Ext.extend(Ext.Panel, {
-    autoScroll: true,
-    frame: true,
-    width: 1000,
-    title: 'Daily Orders Report',
-    flex: 1,
-    initComponent: function () {
-        Ext.applyIf(this, {
-            items: [
-                {
-                    xtype: 'columnchart',
-                    store: dailyOrderReportStore,
-                    yField: 'totalCmOrder',
-                    xField: 'sector',
-                    xAxis: new Ext.chart.CategoryAxis({
-                        title: 'Sector'
-                    }),
-                    yAxis: new Ext.chart.NumericAxis({
-                        title: 'Total CM Order'
-                    }),
-                    url: './resources/ext/resources/charts.swf'
-                },
-                {
-                    xtype: 'columnchart',
-                    store: dailyOrderReportStore,
-                    yField: 'totalBmOrder',
-                    xField: 'sector',
-                    xAxis: new Ext.chart.CategoryAxis({
-                        title: 'Sector'
-                    }),
-                    yAxis: new Ext.chart.NumericAxis({
-                        title: 'Total BM Order'
-                    }),
-                    url: './resources/ext/resources/charts.swf'
-                }
-            ]
-        });
-        DailyOrderReportsChart.superclass.initComponent.call(this);
-    }
-});
- **/
-
-/**
- items:[{
-                    xtype: 'listview',
-                    autoScroll: true,
-                    frame:false,
-                    store: dailyOrderReportStore,
-                    columnResize: false,
-                    columns: [
-                        {
-                            xtype: 'lvcolumn',
-                            dataIndex: 'sector',
-                            header: 'Sector'
-                        },
-                        {
-                            xtype: 'lvcolumn',
-                            dataIndex: 'totalCmOrder',
-                            header: 'CM Order',
-                            width: 0.25
-                        },
-                        {
-                            xtype: 'lvcolumn',
-                            dataIndex: 'totalBmOrder',
-                            header: 'BM Order'
-                        }
-                    ]
-                }]
- **/

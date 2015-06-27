@@ -14,6 +14,7 @@ public class DailyOrderReport {
     private Double cmRevenue;
     private String sector;
     private Date orderDate;
+    private Double totalRevenue;
     private String orderMonth;
 
     public Double getTotalCmOrder() {
@@ -70,5 +71,13 @@ public class DailyOrderReport {
 
     public void setOrderMonth(String orderMonth) {
         this.orderMonth = orderMonth;
+    }
+
+    public Double getTotalRevenue() {
+        return totalRevenue;
+    }
+
+    public void setTotalRevenue(Double totalRevenue) {
+        this.totalRevenue = totalRevenue;
     }
 }

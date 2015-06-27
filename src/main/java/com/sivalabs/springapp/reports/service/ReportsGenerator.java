@@ -1,6 +1,7 @@
 package com.sivalabs.springapp.reports.service;
 
 import com.sivalabs.springapp.DateUtils;
+import com.sivalabs.springapp.entities.DailyOrder;
 import com.sivalabs.springapp.reports.pojo.BillListReport;
 import com.sivalabs.springapp.reports.pojo.DailyOrderGround;
 import com.sivalabs.springapp.reports.pojo.DailyOrderReport;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Service;
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -42,6 +45,17 @@ public class ReportsGenerator {
                 " GROUP BY u.sector";
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         List<DailyOrderReport> dailyOrderReportList = jdbcTemplate.query(sql, new Object[]{formattedDate}, new BeanPropertyRowMapper(DailyOrderReport.class));
+        return dailyOrderReportList;
+    }
+
+    public List<DailyOrderReport> generateDailyRevenueTrend(Month month) throws SQLException{
+        String sql = String.format("SELECT SUM(d0.bmOrder) AS 'totalBmOrder',(SUM(d0.bmOrder) * u.bmPrice) AS 'bmRevenue', SUM(d0.cmOrder) AS 'totalCmOrder', (SUM(d0.cmOrder) * u.cmPrice) AS 'cmRevenue',((SUM(d0.bmOrder) * u.bmPrice) + (SUM(d0.cmOrder) * u.cmPrice)) AS totalRevenue, d0.orderDate as 'orderDate' " +
+                "FROM daily_order d0 " +
+                "INNER JOIN USERS u ON d0.user_Id=u.id where MONTH(d0.orderDate) = '%s' " +
+                "GROUP BY d0.orderDate " +
+                "ORDER BY d0.orderDate",month.getValue());
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        List<DailyOrderReport> dailyOrderReportList = jdbcTemplate.query(sql, new BeanPropertyRowMapper(DailyOrderReport.class));
         return dailyOrderReportList;
     }
 
