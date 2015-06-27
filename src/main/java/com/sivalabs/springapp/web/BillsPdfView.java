@@ -50,8 +50,9 @@ public class BillsPdfView extends AbstractItextPdfView {
     }
 
     private PdfPTable createBillTable(BillListReport billListReport) throws IOException, DocumentException {
-        BaseFont bf = BaseFont.createFont("c:/windows/fonts/arial.ttf",BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-        Font font = new Font(bf, 12, Font.BOLD);
+        //BaseFont bf = BaseFont.createFont("c:/windows/fonts/arial.ttf",BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+        Font font = FontFactory.getFont("/fonts/arial.ttf",
+                BaseFont.IDENTITY_H, BaseFont.EMBEDDED, 12, Font.BOLD, BaseColor.BLACK);
         PdfPTable billTable = new PdfPTable(5);
         Paragraph toAndPhoneParagraph = new Paragraph(new Chunk("To: "+billListReport.getName()+" ("+billListReport.getCustomerId()+") Sector:"+billListReport.getSector()+Chunk.NEWLINE+"Phone: "+billListReport.getPhone(), font));
         PdfPCell toCell = new PdfPCell(toAndPhoneParagraph);
