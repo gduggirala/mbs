@@ -50,7 +50,7 @@ public class ReportsGenerator {
 
     public List<DailyOrderReport> generateDailyRevenueTrend(Month month) throws SQLException{
         String sql = String.format("SELECT SUM(d0.bmOrder) AS 'totalBmOrder',(SUM(d0.bmOrder) * u.bmPrice) AS 'bmRevenue', SUM(d0.cmOrder) AS 'totalCmOrder', (SUM(d0.cmOrder) * u.cmPrice) AS 'cmRevenue',((SUM(d0.bmOrder) * u.bmPrice) + (SUM(d0.cmOrder) * u.cmPrice)) AS totalRevenue, d0.orderDate as 'orderDate' " +
-                "FROM daily_order d0 " +
+                "FROM DAILY_ORDER d0 " +
                 "INNER JOIN USERS u ON d0.user_Id=u.id where MONTH(d0.orderDate) = '%s' " +
                 "GROUP BY d0.orderDate " +
                 "ORDER BY d0.orderDate",month.getValue());
