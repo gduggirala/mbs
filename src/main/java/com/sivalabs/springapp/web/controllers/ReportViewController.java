@@ -51,8 +51,6 @@ public class ReportViewController {
                              HttpServletResponse response) throws Exception {
         LocalDate localDate = LocalDate.now();
         LocalDate previousMonth = localDate.minusMonths(1);
-        LocalDate previousPreviousMonth = localDate.minusMonths(2);
-        Date dateOfConsideration = new Date();
         List<BillListReport> billListReports = reportsGenerator.generateBillReport(previousMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.US));
         ModelAndView modelAndView = new ModelAndView("billsPdfView", "billListReports", billListReports);
         return modelAndView;
@@ -63,8 +61,6 @@ public class ReportViewController {
                                HttpServletResponse response) throws Exception {
         LocalDate localDate = LocalDate.now();
         LocalDate previousMonth = localDate.minusMonths(1);
-        LocalDate previousPreviousMonth = localDate.minusMonths(2);
-        Date dateOfConsideration = new Date();
         String billingMonth = previousMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
         List<BillListReport> billListReports = reportsGenerator.generateBillReport(previousMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.US));
         ModelAndView modelAndView = new ModelAndView("billsXlsView", "billListReports", billListReports);

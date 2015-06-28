@@ -55,7 +55,9 @@ public class BillsPdfView extends AbstractItextPdfView {
         Font font = FontFactory.getFont("/fonts/arial.ttf",
                 BaseFont.IDENTITY_H, BaseFont.EMBEDDED, 12, Font.BOLD, BaseColor.BLACK);
         PdfPTable billTable = new PdfPTable(5);
-        Paragraph toAndPhoneParagraph = new Paragraph(new Chunk("To: "+billListReport.getName()+" ("+billListReport.getCustomerId()+") Sector:"+billListReport.getSector()+Chunk.NEWLINE+"Phone: "+billListReport.getPhone(), font));
+        Paragraph toAndPhoneParagraph = new Paragraph(
+                new Chunk("To: "+billListReport.getName()+" ("+billListReport.getCustomerId()+") Sector:"+billListReport.getSector()+
+                Chunk.NEWLINE+"Phone: "+((billListReport.getPhone()!= null && !billListReport.getPhone().equalsIgnoreCase("Change me"))?billListReport.getPhone():"__________"), font));
         PdfPCell toCell = new PdfPCell(toAndPhoneParagraph);
         toCell.setColspan(4);
         toCell.setRowspan(2);
