@@ -40,7 +40,7 @@ public class BillsPdfView extends AbstractItextPdfView {
                 i++;
                 document.add(createBillTable(billListReport));
                 document.add(new Paragraph("      " + Chunk.NEWLINE));
-                if (i == 4) {
+                if (i == 5) {
                     document.newPage();
                     i = 0;
                 }
@@ -53,13 +53,16 @@ public class BillsPdfView extends AbstractItextPdfView {
         //BaseFont bf = BaseFont.createFont("c:/windows/fonts/arial.ttf",BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
         Font font = FontFactory.getFont("/fonts/arial.ttf",
                 BaseFont.IDENTITY_H, BaseFont.EMBEDDED, 12, Font.BOLD, BaseColor.BLACK);
-        PdfPTable billTable = new PdfPTable(5);
-        Paragraph toAndPhoneParagraph = new Paragraph(new Chunk("To: "+billListReport.getName()+" ("+billListReport.getCustomerId()+") Sector:"+billListReport.getSector()+Chunk.NEWLINE+"Phone: "+billListReport.getPhone(), font));
+        PdfPTable billTable = new PdfPTable(4);
+        String period = "From:"+DateUtils.getFormattedDateForReport(billListReport.getFromDate())+" To: "+DateUtils.getFormattedDateForReport(billListReport.getToDate());
+        Paragraph toAndPhoneParagraph = new
+                Paragraph(new Chunk("To: "+billListReport.getName()+" ("+billListReport.getCustomerId()+") Sector:"+billListReport.getSector()+Chunk.NEWLINE+
+                "Phone: "+(billListReport.getPhone().equalsIgnoreCase("Change me")?"xxx-xxx-xxxx ":billListReport.getPhone())+" Period: "+period,
+                font));
         PdfPCell toCell = new PdfPCell(toAndPhoneParagraph);
-        toCell.setColspan(4);
+        toCell.setColspan(3);
         toCell.setRowspan(2);
         billTable.addCell(toCell);
-
         PdfPCell billNumberAndDate = new PdfPCell(new Paragraph(new Chunk("Bill # : "+billListReport.getId()+Chunk.NEWLINE+"Date:"+ DateUtils.getFormattedDateForReport(billListReport.getGenerationDate())+"", font)));
         billNumberAndDate.setRowspan(2);
         billTable.addCell(billNumberAndDate);
@@ -72,16 +75,16 @@ public class BillsPdfView extends AbstractItextPdfView {
         PdfPCell milkTypeHeaderCell = new PdfPCell(new Paragraph(new Chunk("Milk Type",font)));
         billTable.addCell(milkTypeHeaderCell);
 
-        PdfPCell periodHeaderCell = new PdfPCell(new Paragraph(new Chunk("Period", font)));
+        /*PdfPCell periodHeaderCell = new PdfPCell(new Paragraph(new Chunk("Period", font)));
         billTable.addCell(periodHeaderCell);
-
+*/
         PdfPCell quantityHeaderCell = new PdfPCell(new Paragraph(new Chunk("Quantity", font)));
         billTable.addCell(quantityHeaderCell);
 
         PdfPCell rateHeaderCell = new PdfPCell(new Paragraph(new Chunk("Rate", font)));
         billTable.addCell(rateHeaderCell);
 
-        PdfPCell totalHeaderCell = new PdfPCell(new Paragraph(new Chunk("Total")));
+        PdfPCell totalHeaderCell = new PdfPCell(new Paragraph(new Chunk("Total", font)));
         billTable.addCell(totalHeaderCell);
 
         Paragraph periodParagraph = new Paragraph("From:"+DateUtils.getFormattedDateForReport(billListReport.getFromDate())+
@@ -91,8 +94,8 @@ public class BillsPdfView extends AbstractItextPdfView {
         PdfPCell bmCell = new PdfPCell(new Paragraph("Buffalo Milk"));
         billTable.addCell(bmCell);
 
-        PdfPCell bmPeriodCell = new PdfPCell(periodParagraph);
-        billTable.addCell(bmPeriodCell);
+        /*PdfPCell bmPeriodCell = new PdfPCell(periodParagraph);
+        billTable.addCell(bmPeriodCell);*/
 
         PdfPCell bmQuantityCell = new PdfPCell(new Paragraph(billListReport.getTotalBmQty()+""));
         billTable.addCell(bmQuantityCell);
@@ -107,8 +110,8 @@ public class BillsPdfView extends AbstractItextPdfView {
         PdfPCell cmCell = new PdfPCell(new Paragraph("Cow Milk"));
         billTable.addCell(cmCell);
 
-        PdfPCell cmPeriodCell = new PdfPCell(periodParagraph);
-        billTable.addCell(cmPeriodCell);
+        /*PdfPCell cmPeriodCell = new PdfPCell(periodParagraph);
+        billTable.addCell(cmPeriodCell);*/
 
         PdfPCell cmQuantityCell = new PdfPCell(new Paragraph(billListReport.getTotalCmQty()+""));
         billTable.addCell(cmQuantityCell);
@@ -123,7 +126,7 @@ public class BillsPdfView extends AbstractItextPdfView {
 
         //Other Charges
         PdfPCell otherChargesCell = new PdfPCell(new Paragraph("Other Charges"));
-        otherChargesCell.setColspan(4);
+        otherChargesCell.setColspan(3);
         billTable.addCell(otherChargesCell);
 
         PdfPCell otherChargesValueCell = new PdfPCell(new Paragraph( new Chunk(" \u20B9 "+billListReport.getOtherCharges(), font)));
@@ -131,7 +134,7 @@ public class BillsPdfView extends AbstractItextPdfView {
 
         //Discount
         PdfPCell discountCell = new PdfPCell(new Paragraph("Discount"));
-        discountCell.setColspan(4);
+        discountCell.setColspan(3);
         billTable.addCell(discountCell);
 
         PdfPCell disCountValueCell = new PdfPCell(new Paragraph( new Chunk(" \u20B9 "+billListReport.getDiscount(), font)));
@@ -139,7 +142,7 @@ public class BillsPdfView extends AbstractItextPdfView {
 
         //previous Months Balance
         PdfPCell previousBalanceCell = new PdfPCell(new Paragraph("Previous Balance"));
-        previousBalanceCell.setColspan(4);
+        previousBalanceCell.setColspan(3);
         billTable.addCell(previousBalanceCell);
 
         PdfPCell previousBalanceValueCell = new PdfPCell(new Paragraph( new Chunk(" \u20B9 "+billListReport.getPreviousMonthsBalanceAmount(), font)));
@@ -148,7 +151,7 @@ public class BillsPdfView extends AbstractItextPdfView {
 
         //Grand Total
         PdfPCell grandTotalCell = new PdfPCell(new Paragraph("Grand Total"));
-        grandTotalCell.setColspan(4);
+        grandTotalCell.setColspan(3);
         billTable.addCell(grandTotalCell);
 
         PdfPCell grandTotalValueCell = new PdfPCell(new Paragraph( new Chunk(" \u20B9 "+billListReport.getPayableAmount(), font)));
