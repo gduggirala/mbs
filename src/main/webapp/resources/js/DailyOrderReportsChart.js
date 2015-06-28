@@ -36,16 +36,8 @@ DailyOrderReportsChart = Ext.extend(Ext.Panel, {
                             autoScroll:true,
                             flex:1,
                             html:monthlyRevenueTrendUrl
-                        }/*,
-                        {
-                            xtype:'panel',
-                            autoLoad:{
-                                url:'./rest/google/charts/googleCharts',
-                                scripts:true
-                            }
-
                         }
-*/                    ]
+                    ]
                 },
                 {
                     xtype: 'panel',
