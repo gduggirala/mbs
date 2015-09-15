@@ -1,7 +1,7 @@
 package com.sivalabs.springapp.web;
 
 import com.sivalabs.springapp.DateUtils;
-import com.sivalabs.springapp.reports.pojo.BillListReport;
+import com.sivalabs.springapp.entities.Bill;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -20,7 +20,7 @@ import java.util.Map;
 public class BillsXlsView extends AbstractExcelView {
     @Override
     protected void buildExcelDocument(Map<String, Object> model, HSSFWorkbook workbook, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        List<BillListReport> billListReports = (List<BillListReport>) model.get("billListReports");
+        List<Bill> billListReports = (List<Bill>) model.get("billListReports");
         response.setHeader("content-disposition", "Bills for "+(String)model.get("billingMonth"));
         response.setHeader("Content-Type", "application/octet-stream");
         response.setHeader("Pragma", "public");
@@ -61,7 +61,7 @@ public class BillsXlsView extends AbstractExcelView {
 
         int rowNumber = 1;
 
-        for (BillListReport blr:billListReports){
+        for (Bill blr:billListReports){
             HSSFRow row = sheet.createRow(rowNumber);
             HSSFCell serialNumberCell = row.createCell(0);
             serialNumberCell.setCellType(Cell.CELL_TYPE_NUMERIC);
@@ -88,7 +88,7 @@ public class BillsXlsView extends AbstractExcelView {
             row.createCell(20,Cell.CELL_TYPE_STRING).setCellValue(blr.getMonth());
             row.createCell(21,Cell.CELL_TYPE_NUMERIC).setCellValue(blr.getBillableAmount());
             row.createCell(22, Cell.CELL_TYPE_NUMERIC).setCellValue(blr.getPayableAmount());
-            row.createCell(23, Cell.CELL_TYPE_STRING).setCellValue(blr.getName());
+            row.createCell(23, Cell.CELL_TYPE_STRING).setCellValue(blr.getCustomerName());
             row.createCell(24, Cell.CELL_TYPE_STRING).setCellValue(blr.getSector());
             row.createCell(25, Cell.CELL_TYPE_STRING).setCellValue(blr.getAddress1());
             row.createCell(26, Cell.CELL_TYPE_NUMERIC).setCellValue(blr.getGivenSerialNumber());

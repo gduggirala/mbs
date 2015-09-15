@@ -1,8 +1,7 @@
 package com.sivalabs.springapp.web.controllers;
 
 import com.sivalabs.springapp.DateUtils;
-import com.sivalabs.springapp.entities.DailyOrder;
-import com.sivalabs.springapp.reports.pojo.BillListReport;
+import com.sivalabs.springapp.entities.Bill;
 import com.sivalabs.springapp.reports.pojo.DailyOrderGround;
 import com.sivalabs.springapp.reports.service.ReportsGenerator;
 import com.sivalabs.springapp.services.DailyOrderService;
@@ -51,7 +50,7 @@ public class ReportViewController {
                              HttpServletResponse response) throws Exception {
         LocalDate localDate = LocalDate.now();
         LocalDate previousMonth = localDate.minusMonths(1);
-        List<BillListReport> billListReports = reportsGenerator.generateBillReport(previousMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.US));
+        List<Bill> billListReports = reportsGenerator.generateBillReport(previousMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.US));
         ModelAndView modelAndView = new ModelAndView("billsPdfView", "billListReports", billListReports);
         return modelAndView;
     }
@@ -62,7 +61,7 @@ public class ReportViewController {
         LocalDate localDate = LocalDate.now();
         LocalDate previousMonth = localDate.minusMonths(1);
         String billingMonth = previousMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
-        List<BillListReport> billListReports = reportsGenerator.generateBillReport(previousMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.US));
+        List<Bill> billListReports = reportsGenerator.generateBillReport(previousMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.US));
         ModelAndView modelAndView = new ModelAndView("billsXlsView", "billListReports", billListReports);
         modelAndView.getModelMap().put("billingMonth",billingMonth);
         return modelAndView;

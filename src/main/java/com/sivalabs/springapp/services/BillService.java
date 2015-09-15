@@ -1,6 +1,7 @@
 package com.sivalabs.springapp.services;
 
 import ch.lambdaj.Lambda;
+import com.sivalabs.springapp.DateUtils;
 import com.sivalabs.springapp.entities.Bill;
 import com.sivalabs.springapp.entities.DailyOrder;
 import com.sivalabs.springapp.entities.User;
@@ -132,7 +133,8 @@ public class BillService {
         double totalCmCost = totalCmLiters * cmPrice;
         double totalBmCost = totalBmLiters * bmPrice;
         double billTotal = totalBmCost + totalCmCost;
-        double previousMonthsBalance = bill.getPreviousMonthsBalanceAmount();
+        //double previousMonthsBalance = bill.getPreviousMonthsBalanceAmount();
+        double previousMonthsBalance = getBalanceOfBill(user, (DateUtils.asLocalDate(bill.getFromDate())).minusMonths(1));
 
         double grandTotal = (billTotal + previousMonthsBalance + (bill.getOtherCharges()==null?0.0:bill.getOtherCharges())) - (bill.getDiscount()==null?0.0:bill.getDiscount());
 
@@ -142,6 +144,7 @@ public class BillService {
         bill.setTotalBmPrice(totalBmCost);
         bill.setTotalCmQty(totalCmLiters);
         bill.setTotalCmPrice(totalCmCost);
+        bill.setPreviousMonthsBalanceAmount(previousMonthsBalance);
         bill.setBmPerQuantityPrice(user.getBmPrice());
         bill.setCmPerQuantityPrice(user.getCmPrice());
         if (bill.getPaidAmount() != null) {

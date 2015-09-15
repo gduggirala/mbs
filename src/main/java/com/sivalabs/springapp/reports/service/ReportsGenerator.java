@@ -1,8 +1,7 @@
 package com.sivalabs.springapp.reports.service;
 
 import com.sivalabs.springapp.DateUtils;
-import com.sivalabs.springapp.entities.DailyOrder;
-import com.sivalabs.springapp.reports.pojo.BillListReport;
+import com.sivalabs.springapp.entities.Bill;
 import com.sivalabs.springapp.reports.pojo.DailyOrderGround;
 import com.sivalabs.springapp.reports.pojo.DailyOrderReport;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +12,6 @@ import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.Date;
@@ -85,30 +82,30 @@ public class ReportsGenerator {
         return dailyOrderGroundList;
     }
 
-    public List<BillListReport> generateBillReport(String previousMonth, String previousPreviousMonth) throws SQLException{
+    public List<Bill> generateBillReport(String previousMonth, String previousPreviousMonth) throws SQLException{
         List<String> months = new ArrayList<>(2);
         months.add(previousMonth);
         months.add(previousPreviousMonth);
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("months", months);
-        String sql =String.format("SELECT b0.*, DATE_FORMAT(b0.toDate, '%%M') AS 'month', u.id as 'customerId', u.name, u.sector, u.address1, u.givenSerialNumber, u.phone, u.dailybmOrder, u.dailyCmOrder " +
+        String sql =String.format("SELECT b0.*, DATE_FORMAT(b0.toDate, '%%M') AS 'month', u.id as 'customerId', u.name as `customerName`, u.sector, u.address1, u.givenSerialNumber, u.phone, u.dailybmOrder, u.dailyCmOrder " +
                 "FROM BILL b0 " +
                 "INNER JOIN USERS u ON b0.USER_ID = u.id where DATE_FORMAT(b0.toDate, '%%M') in ('%s', '%s')",previousMonth, previousPreviousMonth);
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-        List<BillListReport> billListReports = jdbcTemplate.query(sql, new BeanPropertyRowMapper(BillListReport.class));
+        List<Bill> billListReports = jdbcTemplate.query(sql, new BeanPropertyRowMapper(Bill.class));
         return billListReports;
     }
 
-    public List<BillListReport> generateBillReport(String month) throws SQLException{
+    public List<Bill> generateBillReport(String month) throws SQLException{
         List<String> months = new ArrayList<>(2);
         months.add(month);
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("months", months);
-        String sql =String.format("SELECT b0.*, DATE_FORMAT(b0.toDate, '%%M') AS 'month', u.id as 'customerId', u.name, u.sector, u.address1, u.givenSerialNumber, u.phone, u.dailybmOrder, u.dailyCmOrder " +
+        String sql =String.format("SELECT b0.*, DATE_FORMAT(b0.toDate, '%%M') AS 'month', u.id as 'customerId', u.name as `customerName`, u.sector, u.address1, u.givenSerialNumber, u.phone, u.dailybmOrder, u.dailyCmOrder " +
                 "FROM BILL b0 " +
                 "INNER JOIN USERS u ON b0.USER_ID = u.id where DATE_FORMAT(b0.toDate, '%%M') in ('%s')",month);
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-        List<BillListReport> billListReports = jdbcTemplate.query(sql, new BeanPropertyRowMapper(BillListReport.class));
+        List<Bill> billListReports = jdbcTemplate.query(sql, new BeanPropertyRowMapper(Bill.class));
         return billListReports;
     }
 }

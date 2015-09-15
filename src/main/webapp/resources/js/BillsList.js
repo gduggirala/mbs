@@ -101,7 +101,11 @@ var editor = new Ext.ux.grid.RowEditor({
     saveText: 'Update'
 });
 
-billListGridRowExpander = new Ext.ux.grid.RowExpander({
+function billsListStoreLoader(){
+    billsListStore.load();
+}
+
+billGridRowExpander = new Ext.ux.grid.RowExpander({
     tpl: new Ext.XTemplate(
         '<style type="text/css">',
         '.tg  {border-collapse:collapse;border-spacing:0;margin-left: 2cm;margin-top: .5cm; margin-bottom: .5cm}',
@@ -111,7 +115,7 @@ billListGridRowExpander = new Ext.ux.grid.RowExpander({
         '</style>',
         '<table class="tg">',
         '<tr>',
-        '<th class="tg-e3zv" colspan="4">To: {name} Customer Id:{customerId}<br>Phone:{phone}</th>',
+        '<th class="tg-e3zv" colspan="4">To: {customerName} Customer Id: {customerId}<br>Phone:{customerPhone}</th>',
         '<th class="tg-e3zv">Bill no: {id}<br>Date:{generationDate:date("d-M-y")}</th>',
         '</tr>',
         '<tr>',
@@ -136,41 +140,41 @@ billListGridRowExpander = new Ext.ux.grid.RowExpander({
         '   <td class="tg-e3zv">{totalCmPrice:inMoney}</td>',
         '   </tr>',
         '<tpl if="otherCharges != 0">',
-            '<tr>',
-            '   <td class="tg-031e" colspan="4">Other Charges</td>',
-            '   <td class="tg-e3zv">{otherCharges:inMoney}</td>',
-            '</tr>',
-        '</tpl>',
-        '<tpl if="previousMonthsBalanceAmount != 0">',
-            '<tr>',
-            '   <td class="tg-031e" colspan="4">Previous months Balance</td>',
-            '   <td class="tg-e3zv">{previousMonthsBalanceAmount:inMoney}</td>',
-            '</tr>',
-        '</tpl>',
-        '<tpl if="discount != 0">',
-            '<tr>',
-            '   <td class="tg-031e" colspan="4">Discount</td>',
-            '   <td class="tg-e3zv">{discount:inMoney}</td>',
-            '</tr>',
-        '</tpl>',
-        '<tpl if="paidAmount != 0">',
-            '<tr>',
-            '   <td class="tg-031e" colspan="4">Paid amount</td>',
-            '   <td class="tg-e3zv">{paidAmount:inMoney}</td>',
-            '</tr>',
+        '<tr>',
+        '   <td class="tg-031e" colspan="4">Other Charges</td>',
+        '   <td class="tg-e3zv">{otherCharges:inMoney}</td>',
+        '</tr>',
         '</tpl>',
         '<tr>',
-        '   <td class="tg-031e" colspan="4">Grand Total</td>',
-        '   <td class="tg-e3zv">{payableAmount:inMoney}</td>',
+        '   <td class="tg-031e" colspan="4">Monthly Total</td>',
+        '   <td class="tg-e3zv">{billableAmount:inMoney}</td>',
         '</tr>',
-
+        '<tpl if="previousMonthsBalanceAmount != 0">',
+        '<tr>',
+        '   <td class="tg-031e" colspan="4">Previous months Balance</td>',
+        '   <td class="tg-e3zv">{previousMonthsBalanceAmount:inMoney}</td>',
+        '</tr>',
+        '</tpl>',
+        '<tpl if="discount != 0">',
+        '<tr>',
+        '   <td class="tg-031e" colspan="4">Adjustment</td>',
+        '   <td class="tg-e3zv">{discount:inMoney}</td>',
+        '</tr>',
+        '</tpl>',
+        '<tpl if="paidAmount != 0">',
+        '<tr>',
+        '   <td class="tg-031e" colspan="4">Paid amount</td>',
+        '   <td class="tg-e3zv">{paidAmount:inMoney}</td>',
+        '</tr>',
+        '</tpl>',
+        '<tr>',
+            '   <td class="tg-031e" colspan="4">Payable total</td>',
+            '   <td class="tg-e3zv">{balanceAmount:inMoney}</td>',
+            '</tr>',
         '</table>'
     )
 });
 
-function billsListStoreLoader(){
-    billsListStore.load();
-}
 BillsList = Ext.extend(Ext.grid.GridPanel, {
     height: 471,
     width: 785,
@@ -182,7 +186,7 @@ BillsList = Ext.extend(Ext.grid.GridPanel, {
     viewConfig: {
         forceFit: true
     },
-    plugins: [billListGridRowExpander],
+    plugins: [billGridRowExpander], //Please check BillGrid.js file for this variable.
     listeners: {
         render: function (thisPanel) {
             var billsListMask = new Ext.LoadMask(Ext.get('billsListGridId'), {msg:"Please wait...", store:billsListStore});
@@ -313,7 +317,7 @@ BillsList = Ext.extend(Ext.grid.GridPanel, {
             ],
             columns: [
                 new Ext.grid.RowNumberer(),
-                billListGridRowExpander,
+                billGridRowExpander,
                 /*
                  {xtype: 'datecolumn', dataIndex: 'fromDate', header: 'From Date', sortable: true, format: 'Y-m-d'},
                  {xtype: 'datecolumn', dataIndex: 'toDate', header: 'To Date', sortable: true, format: 'Y-m-d'},

@@ -3,12 +3,10 @@ package com.sivalabs.springapp.web.controllers;
 import ch.lambdaj.Lambda;
 import com.sivalabs.springapp.DateUtils;
 import com.sivalabs.springapp.entities.Bill;
-import com.sivalabs.springapp.reports.pojo.BillListReport;
 import com.sivalabs.springapp.reports.pojo.DailyOrderGround;
 import com.sivalabs.springapp.reports.pojo.DailyOrderReport;
 import com.sivalabs.springapp.reports.service.ReportsGenerator;
 import com.sivalabs.springapp.services.BillService;
-import org.hamcrest.Matchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,12 +18,11 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.TextStyle;
-import java.time.temporal.TemporalAccessor;
 import java.util.*;
-import java.util.regex.Matcher;
 
 import static ch.lambdaj.Lambda.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
 
 /**
  * User: gduggirala
@@ -118,7 +115,7 @@ public class ReportsResource {
         }
         LocalDate previousMonth = localDate.minusMonths(1);
         LocalDate previousPreviousMonth = localDate.minusMonths(2);
-        List<BillListReport> billListReports = reportsGenerator.generateBillReport(previousMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.US), previousPreviousMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.US));
+        List<Bill> billListReports = reportsGenerator.generateBillReport(previousMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.US), previousPreviousMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.US));
         Map<String, Object> userMap = new HashMap<>();
         userMap.put("success",Boolean.TRUE);
         userMap.put("total",billListReports.size());

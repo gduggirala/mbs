@@ -140,6 +140,10 @@ billGridRowExpander = new Ext.ux.grid.RowExpander({
         '   <td class="tg-e3zv">{otherCharges:inMoney}</td>',
         '</tr>',
         '</tpl>',
+        '<tr>',
+        '   <td class="tg-031e" colspan="4">Monthly Total</td>',
+        '   <td class="tg-e3zv">{billableAmount:inMoney}</td>',
+        '</tr>',
         '<tpl if="previousMonthsBalanceAmount != 0">',
         '<tr>',
         '   <td class="tg-031e" colspan="4">Previous months Balance</td>',
@@ -148,7 +152,7 @@ billGridRowExpander = new Ext.ux.grid.RowExpander({
         '</tpl>',
         '<tpl if="discount != 0">',
         '<tr>',
-        '   <td class="tg-031e" colspan="4">Discount</td>',
+        '   <td class="tg-031e" colspan="4">Adjustment</td>',
         '   <td class="tg-e3zv">{discount:inMoney}</td>',
         '</tr>',
         '</tpl>',
@@ -159,10 +163,9 @@ billGridRowExpander = new Ext.ux.grid.RowExpander({
         '</tr>',
         '</tpl>',
         '<tr>',
-        '   <td class="tg-031e" colspan="4">Grand Total</td>',
-        '   <td class="tg-e3zv">{payableAmount:inMoney}</td>',
-        '</tr>',
-
+            '   <td class="tg-031e" colspan="4">Payable total</td>',
+            '   <td class="tg-e3zv">{balanceAmount:inMoney}</td>',
+            '</tr>',
         '</table>'
     )
 });

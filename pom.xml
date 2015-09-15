@@ -41,7 +41,7 @@
                 <configuration>
                     <scanIntervalSeconds>300</scanIntervalSeconds>
                     <webApp>
-                        <contextPath>/</contextPath>
+                        <contextPath>/cmb</contextPath>
                     </webApp>
                     <systemProperties>
                         <systemProperty>

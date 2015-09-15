@@ -102,6 +102,24 @@ public class Bill {
     @Transient
     private Boolean isPaid;
 
+    @Transient
+    private Double dailybmOrder;
+
+    @Transient
+    private Double dailyCmOrder;
+
+    @Transient
+    private Integer givenSerialNumber;
+
+    @Transient
+    private String sector;
+
+    @Transient
+    private String address1;
+
+    @Transient
+    private String phone; ///
+
     public Long getId() {
         return id;
     }
@@ -274,28 +292,129 @@ public class Bill {
     }
 
     public Double getPayableAmount() {
-        double discountedBalanceAndPayableAmount = ((discount==null?new Double(0):discount) + (previousMonthsBalanceAmount==null?new Double(0):previousMonthsBalanceAmount) + (paidAmount==null?new Double(0):paidAmount));
+        /*double discountedBalanceAndPayableAmount = ((discount==null?new Double(0):discount) + (previousMonthsBalanceAmount==null?new Double(0):previousMonthsBalanceAmount) + (paidAmount==null?new Double(0):paidAmount));
         double totalCmBmAndOtherChargesAmount = ((totalCmPrice==null?new Double(0):totalCmPrice) + (totalBmPrice==null?new Double(0):totalBmPrice) + (otherCharges==null?new Double(0):otherCharges));
         if(discountedBalanceAndPayableAmount < 0){
             return totalCmBmAndOtherChargesAmount + discountedBalanceAndPayableAmount;
         }else {
             return totalCmBmAndOtherChargesAmount - discountedBalanceAndPayableAmount;
+        }*/
+        double discountedBalanceAndPayableAmount = ((discount == null ? new Double(0) : (0-discount)) + (previousMonthsBalanceAmount == null ? new Double(0) : previousMonthsBalanceAmount) + (paidAmount == null ? new Double(0) : paidAmount));
+        double totalCmBmAndOtherChargesAmount = ((totalCmPrice == null ? new Double(0) : totalCmPrice) + (totalBmPrice == null ? new Double(0) : totalBmPrice) + (otherCharges == null ? new Double(0) : otherCharges));
+        if (discountedBalanceAndPayableAmount < 0) {
+            return totalCmBmAndOtherChargesAmount + discountedBalanceAndPayableAmount;
+        } else {
+            return totalCmBmAndOtherChargesAmount - discountedBalanceAndPayableAmount;
         }
+       /* return ((totalCmPrice==null?0:totalCmPrice) + (totalBmPrice==null?0:totalBmPrice) + (otherCharges==null?0:otherCharges)) -
+                ((discount==null?0:discount) + (previousMonthsBalanceAmount==null?0:previousMonthsBalanceAmount) + (paidAmount==null?0:paidAmount));*/
     }
 
     public String getCustomerName() {
-        return user.getName();
+        if(this.customerName == null) {
+            return user.getName();
+        }else {
+            return this.customerName;
+        }
+    }
+
+    public void setCustomerName(String name){
+        this.customerName = name;
     }
 
     public Long getCustomerId() {
-        return user.getId();
+        if (customerId == null) {
+            return user.getId();
+        }else {
+            return this.customerId;
+        }
     }
 
     public String getCustomerPhone() {
-        return user.getPhone();
+        if (this.phone == null) {
+            return user.getPhone();
+        }else {
+            return this.phone;
+        }
     }
 
     public Boolean isPaid() {
         return !(this.getPaidAmount() <=0 && this.balanceAmount > 0);
+    }
+
+    public void setMonth(String month) {
+        this.month = month;
+    }
+
+    public void setBillableAmount(Double billableAmount) {
+        this.billableAmount = billableAmount;
+    }
+
+    public void setPayableAmount(Double payableAmount) {
+        this.payableAmount = payableAmount;
+    }
+
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
+    }
+
+    public void setCustomerPhone(String customerPhone) {
+        this.customerPhone = customerPhone;
+    }
+
+    public Boolean getIsPaid() {
+        return isPaid;
+    }
+
+    public void setIsPaid(Boolean isPaid) {
+        this.isPaid = isPaid;
+    }
+
+    public Double getDailybmOrder() {
+        return dailybmOrder;
+    }
+
+    public void setDailybmOrder(Double dailybmOrder) {
+        this.dailybmOrder = dailybmOrder;
+    }
+
+    public Double getDailyCmOrder() {
+        return dailyCmOrder;
+    }
+
+    public void setDailyCmOrder(Double dailyCmOrder) {
+        this.dailyCmOrder = dailyCmOrder;
+    }
+
+    public Integer getGivenSerialNumber() {
+        return givenSerialNumber;
+    }
+
+    public void setGivenSerialNumber(Integer givenSerialNumber) {
+        this.givenSerialNumber = givenSerialNumber;
+    }
+
+    public String getSector() {
+        return sector;
+    }
+
+    public void setSector(String sector) {
+        this.sector = sector;
+    }
+
+    public String getAddress1() {
+        return address1;
+    }
+
+    public void setAddress1(String address1) {
+        this.address1 = address1;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }

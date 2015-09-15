@@ -7,12 +7,11 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.sivalabs.springapp.DateUtils;
-import com.sivalabs.springapp.reports.pojo.BillListReport;
+import com.sivalabs.springapp.entities.Bill;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -28,19 +27,19 @@ import static ch.lambdaj.Lambda.on;
 public class BillsPdfView extends AbstractItextPdfView {
     protected void buildPdfDocument(Map<String, Object> model, Document document,
                                     PdfWriter writer, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        List<BillListReport> billListReports = (List<BillListReport>) model.get("billListReports");
-        Group<BillListReport> billListReportGroup = group(billListReports, by(on(BillListReport.class).getSector()));
+        List<Bill> billListReports = (List<Bill>) model.get("billListReports");
+        Group<Bill> billListReportGroup = group(billListReports, by(on(Bill.class).getSector()));
         response.setHeader("content-disposition", "Bills List");
         response.setHeader("Content-Type", "application/octet-stream");
         response.setHeader("Pragma", "public");
         for (String sector:billListReportGroup.keySet()) {
-            List<BillListReport> billListReports1 = billListReportGroup.find(sector);
+            List<Bill> billListReports1 = billListReportGroup.find(sector);
             int i = 0;
-            for (BillListReport billListReport : billListReports1) {
+            for (Bill billListReport : billListReports1) {
                 i++;
                 document.add(createBillTable(billListReport));
                 document.add(new Paragraph("      " + Chunk.NEWLINE));
-                if (i == 4) {
+                if (i == 2) {
                     document.newPage();
                     document.add(new Paragraph("      " + Chunk.NEWLINE));
                     i = 0;
@@ -50,13 +49,29 @@ public class BillsPdfView extends AbstractItextPdfView {
         }
     }
 
-    private PdfPTable createBillTable(BillListReport billListReport) throws IOException, DocumentException {
-        //BaseFont bf = BaseFont.createFont("c:/windows/fonts/arial.ttf",BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+    private PdfPTable createBillTable(Bill billListReport) throws IOException, DocumentException {
         Font font = FontFactory.getFont("/fonts/arial.ttf",
                 BaseFont.IDENTITY_H, BaseFont.EMBEDDED, 12, Font.BOLD, BaseColor.BLACK);
+        Font logoFont = FontFactory.getFont("/fonts/arial.ttf",
+                BaseFont.IDENTITY_H, BaseFont.EMBEDDED, 12, Font.BOLD, BaseColor.BLACK);
+        Image logoImage = Image.getInstance("http://localhost:8080/cmb/resources/img/finallogo.jpg");
+        logoImage.scaleToFit(120f,300f);
+        logoImage.setAlignment(Element.ALIGN_CENTER);
         PdfPTable billTable = new PdfPTable(5);
+        Paragraph companyLogoAndNameParagraph = new Paragraph(
+                new Chunk("Ph: +917893669493, www.djandcdairy.com, www.facebook.com/djandcdairy", logoFont)
+        );
+        PdfPCell logoImageCell = new PdfPCell();
+        logoImageCell.setColspan(5);
+        logoImageCell.setRowspan(4);
+        logoImageCell.addElement(logoImage);
+        logoImageCell.addElement(companyLogoAndNameParagraph);
+        logoImageCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        //logoImageCell.addElement(new Paragraph("      " + Chunk.NEWLINE));
+        billTable.addCell(logoImageCell);
+
         Paragraph toAndPhoneParagraph = new Paragraph(
-                new Chunk("To: "+billListReport.getName()+" ("+billListReport.getCustomerId()+") Sector:"+billListReport.getSector()+
+                new Chunk("To: "+billListReport.getCustomerName()+" ("+billListReport.getCustomerId()+") Sector:"+billListReport.getSector()+
                 Chunk.NEWLINE+"Phone: "+((billListReport.getPhone()!= null && !billListReport.getPhone().equalsIgnoreCase("Change me"))?billListReport.getPhone():"__________"), font));
         PdfPCell toCell = new PdfPCell(toAndPhoneParagraph);
         toCell.setColspan(4);
@@ -73,18 +88,23 @@ public class BillsPdfView extends AbstractItextPdfView {
         billTable.addCell(phoneCell);*/
 
         PdfPCell milkTypeHeaderCell = new PdfPCell(new Paragraph(new Chunk("Milk Type",font)));
+        milkTypeHeaderCell.setRowspan(2);
         billTable.addCell(milkTypeHeaderCell);
 
         PdfPCell periodHeaderCell = new PdfPCell(new Paragraph(new Chunk("Period", font)));
+        periodHeaderCell.setRowspan(2);
         billTable.addCell(periodHeaderCell);
 
         PdfPCell quantityHeaderCell = new PdfPCell(new Paragraph(new Chunk("Quantity", font)));
+        quantityHeaderCell.setRowspan(2);
         billTable.addCell(quantityHeaderCell);
 
         PdfPCell rateHeaderCell = new PdfPCell(new Paragraph(new Chunk("Rate", font)));
+        rateHeaderCell.setRowspan(2);
         billTable.addCell(rateHeaderCell);
 
         PdfPCell totalHeaderCell = new PdfPCell(new Paragraph(new Chunk("Total")));
+        totalHeaderCell.setRowspan(2);
         billTable.addCell(totalHeaderCell);
 
         Paragraph periodParagraph = new Paragraph("From:"+DateUtils.getFormattedDateForReport(billListReport.getFromDate())+
@@ -125,36 +145,62 @@ public class BillsPdfView extends AbstractItextPdfView {
         billTable.addCell(cmTotalPriceCell);
 
         //Other Charges
-        PdfPCell otherChargesCell = new PdfPCell(new Paragraph("Other Charges"));
+        PdfPCell otherChargesCell = new PdfPCell();
+        otherChargesCell.addElement(new Paragraph("Other Charges"));
+        otherChargesCell.addElement(new Paragraph("      " + Chunk.NEWLINE));
         otherChargesCell.setColspan(4);
+   //     otherChargesCell.setRowspan(3);
         billTable.addCell(otherChargesCell);
 
-        PdfPCell otherChargesValueCell = new PdfPCell(new Paragraph( new Chunk(" \u20B9 "+billListReport.getOtherCharges(), font)));
+        PdfPCell otherChargesValueCell = new PdfPCell();
+        otherChargesValueCell.addElement(new Paragraph( new Chunk(" \u20B9 "+billListReport.getOtherCharges(), font)));
+        otherChargesValueCell.addElement(new Paragraph("      " + Chunk.NEWLINE));
+   //     otherChargesValueCell.setRowspan(3);
         billTable.addCell(otherChargesValueCell);
 
         //Discount
-        PdfPCell discountCell = new PdfPCell(new Paragraph("Discount"));
+        PdfPCell discountCell = new PdfPCell(); //Discount
+        discountCell.addElement(new Paragraph("Adjustments"));
+        discountCell.addElement(new Paragraph("      " + Chunk.NEWLINE));
         discountCell.setColspan(4);
+     //   discountCell.setRowspan(2);
         billTable.addCell(discountCell);
 
-        PdfPCell disCountValueCell = new PdfPCell(new Paragraph( new Chunk(" \u20B9 "+billListReport.getDiscount(), font)));
+        PdfPCell disCountValueCell = new PdfPCell();
+        disCountValueCell.addElement(new Paragraph( new Chunk(" \u20B9 "+billListReport.getDiscount(), font)));
+        disCountValueCell.addElement(new Paragraph("      " + Chunk.NEWLINE));
+      //  disCountValueCell.setRowspan(2);
         billTable.addCell(disCountValueCell);
 
         //previous Months Balance
-        PdfPCell previousBalanceCell = new PdfPCell(new Paragraph("Previous Balance"));
+        PdfPCell previousBalanceCell = new PdfPCell();
+        previousBalanceCell.addElement(new Paragraph("Previous Balance"));
+        previousBalanceCell.addElement(new Paragraph("      " + Chunk.NEWLINE));
         previousBalanceCell.setColspan(4);
+      //  previousBalanceCell.setRowspan(2);
         billTable.addCell(previousBalanceCell);
 
-        PdfPCell previousBalanceValueCell = new PdfPCell(new Paragraph( new Chunk(" \u20B9 "+billListReport.getPreviousMonthsBalanceAmount(), font)));
+        PdfPCell previousBalanceValueCell = new PdfPCell();
+        previousBalanceValueCell.addElement(new Paragraph( new Chunk(" \u20B9 "+billListReport.getPreviousMonthsBalanceAmount(), font)));
+        previousBalanceValueCell.addElement(new Paragraph("      " + Chunk.NEWLINE));
+        previousBalanceValueCell.setColspan(4);
+     //   previousBalanceValueCell.setRowspan(2);
         billTable.addCell(previousBalanceValueCell);
 
 
         //Grand Total
-        PdfPCell grandTotalCell = new PdfPCell(new Paragraph("Grand Total"));
+        PdfPCell grandTotalCell = new PdfPCell();
+        grandTotalCell.addElement(new Paragraph("Grand Total"));
+        grandTotalCell.addElement(new Paragraph("      " + Chunk.NEWLINE));
         grandTotalCell.setColspan(4);
+      //  grandTotalCell.setRowspan(2);
         billTable.addCell(grandTotalCell);
 
-        PdfPCell grandTotalValueCell = new PdfPCell(new Paragraph( new Chunk(" \u20B9 "+billListReport.getPayableAmount(), font)));
+        PdfPCell grandTotalValueCell = new PdfPCell();
+        grandTotalValueCell.addElement(new Paragraph( new Chunk(" \u20B9 "+billListReport.getBalanceAmount(), font)));
+        grandTotalValueCell.addElement(new Paragraph("      " + Chunk.NEWLINE));
+        grandTotalValueCell.setRowspan(2);
+     //   grandTotalValueCell.setRowspan(2);
         billTable.addCell(grandTotalValueCell);
 
         return billTable;
